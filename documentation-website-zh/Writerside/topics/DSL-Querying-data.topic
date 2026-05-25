@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="查询数据" id="DSL-Querying-data" help-id="Querying-data">
+    <show-structure for="chapter,procedure" depth="2"/>
+    <chapter id="where-expression">
+        <title>使用 <code>where</code> 表达式</title>
+        <p>
+            <code>where</code> 表达式是 Exposed 中构建查询的核心组件，允许您通过指定条件来过滤数据。<code>where</code> 表达式期望一个布尔运算符
+            （<code>Op&lt;Boolean&gt;</code>），其求值结果为 <code>true</code> 或 <code>false</code>。
+        </p>
+        <p>我们将可用条件分为以下几组：</p>
+        <list>
+            <li><a anchor="basic">基本条件</a></li>
+            <li><a anchor="logical-conditions">逻辑条件</a></li>
+            <li><a anchor="pattern-matching-conditions">模式匹配条件</a></li>
+            <li><a anchor="range-conditions">范围条件</a></li>
+            <li><a anchor="collection-conditions">集合条件</a></li>
+        </list>
+        <chapter title="基本条件" id="basic">
+            <p>
+                基本条件是简单的比较，例如相等（<code>eq</code>）和不等
+                （<code>neq</code>）。
+            </p>
+            <deflist type="medium">
+                <def id="eq">
+                    <title><code>eq</code></title>
+                    检查表达式是否等于某个值。
+                </def>
+                <def id="neq">
+                    <title><code>neq</code></title>
+                    检查表达式是否不等于某个值。
+                </def>
+                <def id="isNull">
+                    <title><code>isNull()</code></title>
+                    如果此表达式为 null 则返回 <code>true</code>，否则返回 <code>false</code>。
+                </def>
+                <def id="isNotNull">
+                    <title><code>isNotNull()</code></title>
+                    如果此表达式为 null 则返回 <code>false</code>，否则返回 <code>true</code>。
+                </def>
+                <def id="less">
+                    <title><code>less</code></title>
+                    检查表达式是否小于某个值。
+                </def>
+                <def id="lessEq">
+                    <title><code>lessEq</code></title>
+                    检查表达式是否小于或等于某个值。
+                </def>
+                <def id="greater">
+                    <title><code>greater</code></title>
+                    检查表达式是否大于某个值。
+                </def>
+                <def id="greaterEq">
+                    <title><code>greaterEq</code></title>
+                    检查表达式是否大于或等于某个值。
+                </def>
+                <def id="exists">
+                    <title><code>exists</code></title>
+                    检查子查询是否返回至少一行。
+                </def>
+                <def id="notExists">
+                    <title><code>notExists</code></title>
+                    检查子查询是否未返回任何行。
+                </def>
+                <def id="isDistinctFrom">
+                    <title><code>isDistinctFrom</code></title>
+                    检查此表达式是否不等于另一个值，null 被视为可比较的值。
+                </def>
+                <def id="isNotDistinctFrom">
+                    <title><code>isNotDistinctFrom</code></title>
+                    检查表达式是否等于另一个值，null 被视为可比较的值。
+                </def>
+            </deflist>
+
+        </chapter>
+        <chapter id="logical-conditions" title="逻辑条件">
+            <p>逻辑条件是使用逻辑运算符的条件，例如 <code>AND</code>、<code>OR</code>
+                和 <code>NOT</code>。</p>
+            <deflist>
+                <def id="and">
+                    <title><code>and</code></title>
+                    返回在两个表达式之间执行逻辑 <code>and</code> 操作的结果。
+                </def>
+                <def id="or">
+                    <title><code>or</code></title>
+                    返回在两个表达式之间执行逻辑 <code>or</code> 操作的结果。
+                </def>
+                <def id="not">
+                    <title><code>not</code></title>
+                    返回表达式的反值。
+                </def>
+                <def id="andIfNotNull">
+                    <title><code>andIfNotNull</code></title>
+                    如果第二个表达式不为 null，则返回在两个表达式之间执行逻辑 <code>and</code> 操作的结果。
+                </def>
+                <def id="orIfNotNull">
+                    <title><code>orIfNotNull</code></title>
+                    如果第二个表达式不为 null，则返回在两个表达式之间执行逻辑 <code>or</code> 操作的结果。
+                </def>
+                <def id="compoundAnd">
+                    <title><code>compoundAnd()</code></title>
+                    通过对列表中的所有表达式执行 <code>and</code> 操作，将列表归约为单个表达式。
+                </def>
+                <def id="compoundOr">
+                    <title><code>compoundOr()</code></title>
+                    通过对列表中的所有表达式执行 <code>or</code> 操作，将列表归约为单个表达式。
+                </def>
+            </deflist>
+        </chapter>
+        <chapter title="模式匹配条件" id="pattern-matching-conditions">
+            <p>
+                允许您使用运算符（如 <code>LIKE</code>）检查模式匹配的条件。
+            </p>
+            <deflist>
+                <def id="like">
+                    <title><code>like</code></title>
+                    检查表达式是否匹配指定的模式。
+                    <code-block lang="kotlin"
+                                src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                                include-symbol="allMoviesLike"/>
+                </def>
+                <def id="notLike">
+                    <title><code>notLike</code></title>
+                    检查表达式是否不匹配指定的模式。
+                    <code-block lang="kotlin"
+                                src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                                include-symbol="allMoviesNotLike"/>
+                </def>
+                <def id="regexp">
+                    <title><code>regexp</code></title>
+                    检查表达式是否匹配正则表达式。
+                    <code-block lang="kotlin"
+                                src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                                include-symbol="allMatchingRegex"/>
+                </def>
+                <def id="match">
+                    <title><code>match</code></title>
+                    检查表达式是否基于特定模式匹配给定的模式。
+                    <p>
+                        仅支持 MySQL 和 MariaDB。
+                    </p>
+                </def>
+            </deflist>
+    </chapter>
+        <chapter title="范围条件" id="range-conditions">
+            <p>
+                要检查值是否在指定范围内，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-i-sql-expression-builder/between.html">
+                    <code>.between()</code>
+                </a>
+                函数。
+            </p>
+            <p>
+                它检查表达式是否在 from 和 to 值之间。如果表达式在下限和上限范围值之间（包含）则返回 <code>true</code>。日期和时间值也
+                支持作为参数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                        include-symbol="allBetween"/>
+        </chapter>
+        <chapter title="集合条件" id="collection-conditions">
+            <p>
+                要检查表达式是否等于列表中的任何元素，请使用 <code>inList</code> 或
+                <code>notInList</code> 运算符。
+            </p>
+            <chapter id="collection-condition-lists">
+                <title>将 <code>inList</code> 与列表一起使用</title>
+                <p>
+                    <code>inList</code> 运算符检查表达式是否匹配列表中的任何值。
+                    在以下示例中，查询选择所有 <code>sequelId</code> 值为 6 或 4 的电影。
+                </p>
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                            include-symbol="allInList"/>
+            </chapter>
+            <chapter id="collection-condition-pairs-or-triples">
+                <title>将 <code>inList</code> 与 Pair 或 Triple 一起使用</title>
+                <p>
+                    <code>inList</code> 运算符还可以处理多个表达式，例如 pair 或 triple，
+                    以检查多列之间的相等性。
+                </p>
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                            include-symbol="topRated, multipleInList"/>
+            </chapter>
+            <chapter id="any-all">
+                <title>使用 <code>ANY</code> 和 <code>ALL</code></title>
+                <p>除了 <code>IN</code> 运算符外，<code>ANY</code> 和 <code>ALL</code> 运算符可与任何前面的比较运算符一起使用：</p>
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                            include-symbol="anyFromArray"/>
+                <p>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/any-from.html">
+                        <code>anyFrom()</code>
+                    </a>
+                    和
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/all-from.html">
+                        <code>allFrom()</code>
+                    </a>
+                    也接受子查询、表和数组表达式作为参数。</p>
+            </chapter>
+
+        </chapter>
+    </chapter>
+    <chapter id="conditional-where">
+        <title>条件 <code>WHERE</code></title>
+        <p>
+            在使用 SQL 数据库时，具有依赖于某些条件的 <code>WHERE</code> 子句的查询是很常见的情况。这些条件通常来自应用程序逻辑或用户输入。
+            管理这些条件可能变得复杂，尤其是在独立或嵌套条件的情况下。
+        </p>
+        <p>
+            想象一个网站上的表单，用户可以选择性地按导演和/或续集过滤"星球大战"电影。要构建这样的查询，您可以使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/and-where.html">
+                <code>.andWhere()</code>
+            </a>
+            函数：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                    include-symbol="findWithConditionalWhere"/>
+        <p>
+            在上面的示例中，查询从 <code>selectAll()</code> 开始，它从
+            <code>StarWarsFilmsTable</code> 检索所有行。然后，使用 <code>let</code> 函数确保只有在提供值时才应用
+            <code>directorName</code> 和 <code>sequelId</code> 的条件 <code>WHERE</code> 子句。
+        </p>
+        <chapter title="条件连接" id="conditional-joins">
+            <p>
+                有时，您可能不仅需要修改 <code>WHERE</code> 子句，还需要根据某些条件修改底层表连接。例如，按演员姓名过滤可能需要条件性地连接
+                <code>ActorsTable</code>。
+            </p>
+            <p>
+                在这些情况下，您可以使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-query/adjust-column-set.html">
+                    <code>.adjustColumnSet()</code>
+                </a>
+                和
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-query/adjust-select.html">
+                    <code>.adjustSelect()</code>
+                </a> 函数，
+                它们允许扩展和修改查询的 <code>JOIN</code> 和 <code>SELECT</code> 部分：
+            </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                    include-symbol="findWithConditionalJoin"/>
+        </chapter>
+    </chapter>
+    <chapter title="聚合和排序数据" id="aggregate-and-sort">
+        <chapter title="计数" id="count">
+            <p>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/count.html">
+                    <code>.count()</code>
+                </a>
+                方法用于确定匹配查询的行数。
+                它在 <code>Query</code> 对象上调用，返回总行数。
+            </p>
+            <p>
+                以下示例计算所有 <code>sequelId</code> 等于 <code>8</code> 的行：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                        include-symbol="count"/>
+        </chapter>
+        <chapter title="排序" id="order-by">
+            <p>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-query/order-by.html">
+                    <code>.orderBy()</code>
+                </a>
+                函数允许您通过指定列列表及其排序顺序（升序或降序）来对查询结果进行排序。
+            </p>
+            <p>
+                在以下示例中，<code>StarWarsFilmsTable.sequelId </code> 指定要排序的列，
+                <code>SortOrder.ASC</code> 将排序顺序设置为升序：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                        include-symbol="sortedFilms"/>
+        </chapter>
+        <chapter title="分组" id="group-by">
+            <p>
+                在
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-abstract-query/group-by.html">
+                    <code>.groupBy()</code>
+                </a>
+                中，通过 <code>.select()</code> 方法定义字段及其函数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                        include-symbol="groupedFilms"/>
+            <p>
+                可用的字段函数有：<code>.count()</code>、<code>.sum()</code>、<code>.average()</code>、
+                <code>.min()</code>
+                和 <code>.max()</code>。
+            </p>
+        </chapter>
+    </chapter>
+    <chapter title="限制结果集" id="limit-result-sets">
+        <p>
+            您可以使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-abstract-query/limit.html">
+                <code>.limit()</code>
+            </a>
+            函数来防止加载大型数据集，或通过使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-abstract-query/offset.html">
+                <code>.offset()</code>
+            </a>
+            函数来实现分页。
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/QueryingExamples.kt"
+                    include-symbol="limitedFilms"/>
+    </chapter>
+    <chapter title="使用别名映射字段" id="alias">
+        <p>
+            别名允许避免字段名和表名之间的歧义。
+            要使用别名的 <code>var</code> 而不是原始的，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/alias.html">
+                <code>.alias()</code>
+            </a>
+            函数：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/AliasExamples.kt"
+                    include-symbol="filmTable1, allFilms"/>
+        <p>
+            别名还允许您在连接中多次使用同一个表：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/AliasExamples.kt"
+                    include-symbol="sequelTable, originalAndSequelNames"/>
+        <p>它们也可以在从子查询中选择时使用：</p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/AliasExamples.kt"
+                    include-symbol="starWarsFilms, id, name, allStarWarsFilms"/>
+    </chapter>
+    <chapter title="自定义 Select 查询" id="custom-select-queries">
+        <p>
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-query/index.html">
+                <code>Query</code>
+            </a>
+            实例可以通过在 <code>Table</code> 或 <code>Join</code> 上调用 <code>.selectAll()</code> 或 <code>.select()</code> 来实例化，
+            它具有许多用于构建复杂查询的扩展函数。
+            其中一些已经在上面提到过，如 <a anchor="where-expression">.where()</a>、<a
+                 anchor="group-by">.groupBy()</a> 和 <a anchor="order-by">.orderBy()</a>。
+        </p>
+        <p>
+            如果需要带有特殊子句的 <code>SELECT</code> 查询，可以实现自定义扩展函数，
+            以便与其他标准查询一起使用。
+        </p>
+        <p>
+            例如，MySQL 索引提示（在 SQL 中跟在表名后面）可以通过使用以下自定义函数和类在
+            <code>SELECT</code> 查询上实现：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/CustomSelectExamples.kt"
+                    include-lines="4-6,9,18-39"/>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/CustomSelectExamples.kt"
+                    include-lines="43-48,56-58"/>
+    </chapter>
+</topic>

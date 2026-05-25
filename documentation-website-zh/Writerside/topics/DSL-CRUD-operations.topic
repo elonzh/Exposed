@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       id="DSL-CRUD-operations" title="CRUD 操作" help-id="Deep-Dive-into-DSL;CRUD-operations">
+
+    <show-structure for="chapter,procedure" depth="2"/>
+
+    <p>CRUD 代表创建（Create）、读取（Read）、更新（Update）和删除（Delete），这是数据库需要支持的四种基本操作。本
+        节展示如何使用 Kotlin DSL 执行 SQL CRUD 操作。</p>
+    <chapter title="创建" id="create">
+        <p>Exposed 提供了多个函数来向表中插入行：</p>
+
+        <chapter title="插入单行" id="insert">
+            <tldr>
+                <p>API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/insert.html">
+                    <code>insert</code> (JDBC)
+                </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/insert.html">
+                    <code>insert</code> (R2DBC)
+                </a>  </p>
+            </tldr>
+            <p>
+                要创建新的表行，请使用 <code>.insert()</code> 函数。如果表中已存在相同的行，
+                它将抛出异常。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                        include-lines="27-31"/>
+            <p>该示例对应以下 SQL 语句：</p>
+            <code-block lang="sql"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                        include-lines="23-24"/>
+            <chapter title="插入并获取 ID" id="insertAndGetId">
+                <tldr>
+                    <p> 支持的表类型：<code>IdTable()</code> </p>
+                        <p>API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/insert-and-get-id.html">
+                            <code>insertAndGetId</code> (JDBC)
+                        </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/insert-and-get-id.html">
+                            <code>insertAndGetId</code> (R2DBC)
+                        </a>  </p>
+                </tldr>
+                <p>要添加新行并返回其 ID，请使用 <code>.insertAndGetId()</code>。如果表中已存在相同的行，
+                    它将抛出异常。</p>
+
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                            include-symbol="id"/>
+                <code-block lang="sql"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                            include-lines="36-37"/>
+            </chapter>
+        </chapter>
+
+        <chapter title="从查询插入" id="insert-from-select">
+            <p>
+                对于 <code>INSERT INTO ... SELECT </code> SQL 子句，请使用带有 <code>Query</code> 参数的 <code>.insert()</code>
+                函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/InsertSelectExamples.kt"
+                        include-symbol="substring, insertedRows"
+            />
+            <p>默认情况下，它将尝试按照 <code>Table</code> 实例中定义的顺序插入到所有非自增 <code>Table</code> 列中。如果要指定列或更改
+                顺序，请将列列表作为第二个参数提供：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/InsertSelectExamples.kt"
+                        include-symbol="userCount, insertedUsers"
+            />
+        </chapter>
+
+        <chapter title="插入并忽略" id="insertIgnore">
+            <tldr>
+                <p>支持的数据库：MySQL、MariaDB、PostgreSQL 和 SQLite</p>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/insert-ignore.html">
+                    <code>insertIgnore</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/insert-ignore.html">
+                        <code>insertIgnore</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>
+                要允许插入语句执行而不抛出任何错误，请使用 <code>.insertIgnore()</code>。
+                例如，当可能发生插入冲突时，这可能很有用：</p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                        include-lines="49-60"/>
+            <p>
+                如果使用 <code>.insert()</code> 而不是 <code>.insertIgnore()</code>，这将抛出约束
+                违规异常。相反，这个新行将被忽略并丢弃。
+            </p>
+            <chapter title="插入并忽略并获取 ID" id="insertIgnoreAndGetId">
+                <tldr>
+                    <p>支持的数据库：MySQL、MariaDB、PostgreSQL 和 SQLite</p>
+                    <p>表类型：<code>IdTable()</code></p>
+                    <p>
+                        API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/insert-ignore-and-get-id.html">
+                        <code>insertIgnoreAndGetId</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/insert-ignore-and-get-id.html">
+                        <code>insertIgnoreAndGetId</code> (R2DBC)
+                    </a>
+                    </p>
+                </tldr>
+                <p>
+                    <code>.insertIgnoreAndGetId()</code> 添加新行并返回其 ID。如果表中已存在相同的行，
+                    它会忽略该行而不抛出异常。</p>
+
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                            include-symbol="rowId"/>
+                <code-block lang="sql"
+                            src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                            include-lines="62-63"/>
+            </chapter>
+        </chapter>
+
+        <chapter title="批量插入" id="batch-insert">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/batch-insert.html">
+                    <code>batchInsert</code> (JDBC)
+                </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/batch-insert.html">
+                    <code>batchInsert</code> (R2DBC)
+                </a>
+                </p>
+            </tldr>
+            <p>
+                <code>.batchInsert()</code> 允许在单个 SQL 语句中将实体列表映射为表行。
+                它比对每行使用 <code>insert</code> 查询更高效，因为它只发起一个
+                语句。
+            </p>
+            <p>以下示例使用简单列表：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                        include-lines="75-79"/>
+            <p>以下是使用数据类实例列表的示例：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                        include-lines="83-95"/>
+            <note>
+                <code>.batchInsert()</code> 函数在与数据库交互时仍然会创建多个 <code>INSERT</code> 语句。
+                <p>要将 <code>INSERT</code> 语句转换为 <code>BULK INSERT</code>，请使用
+                    相关 JDBC 驱动程序的
+                    <code>rewriteBatchedInserts=true</code>
+                    （或 <code>rewriteBatchedStatements=true</code>）
+                    选项。</p>
+                <p>有关更多信息，请参阅 <a
+                    href="https://dev.mysql.com/doc/connector-j/en/connector-j-connp-props-performance-extensions.html#cj-conn-prop_rewriteBatchedStatements">MySQL</a>
+                    和
+                    <a href="https://jdbc.postgresql.org/documentation/use/">PostgreSQL</a> 的此选项文档。</p>
+            </note>
+
+            <p>
+                如果您不需要获取新生成的值（例如自增 ID），请将
+                <code>shouldReturnGeneratedValues</code> 参数设置为 <code>false</code>。这通过将批量插入分块来提高
+                批量插入的性能，而不是始终等待数据库同步新插入的对象状态。
+            </p>
+            <p>
+                如果您想检查 <code>rewriteBatchedInserts</code> 和 <code>batchInsert</code> 是否正常
+                工作，您需要为驱动程序启用 JDBC 日志记录。这是必要的，因为 Exposed 将始终
+                显示未重写的多个插入语句。有关更多信息，请参阅
+                <a href="https://jdbc.postgresql.org/documentation/logging/">
+                    如何在 PostgreSQL 中启用日志记录
+                </a>
+                。
+            </p>
+        </chapter>
+    </chapter>
+    <chapter title="读取" id="read">
+        <chapter title="检索单条记录" id="select">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/select.html">
+                    <code>select</code> (JDBC)
+                </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/select.html">
+                    <code>select</code> (R2DBC)
+                </a>
+                </p>
+            </tldr>
+            <p><code>.select()</code> 函数允许您选择特定的列和/或表达式。</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-symbol="filmAndDirector"/>
+            <p>如果您只想选择不同的值，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-abstract-query/with-distinct.html">
+                    <code>.withDistinct()</code>
+                </a>
+                函数：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-lines="32-36"/>
+            <p>某些 SQL 方言（如 PostgreSQL 和 H2）还支持 <code>DISTINCT ON</code> 子句。
+                您可以使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-abstract-query/with-distinct-on.html">
+                    <code>.withDistinctOn()</code>
+                </a>
+                函数来使用此子句：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-lines="46-54"/>
+        </chapter>
+        <chapter title="检索所有记录" id="selectAll">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/select-all.html">
+                    <code>selectAll</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/select-all.html">
+                        <code>selectAll</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>
+                要从表中检索所有记录，请使用 <code>.selectAll()</code> 方法：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-lines="100-101"/>
+            <p>
+                <code>Query</code> 继承了 <code>Iterable</code>，因此可以使用 <code>.map()</code>
+                或 <code>.forEach()</code> 进行遍历：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-lines="103-105"/>
+        </chapter>
+        <chapter id="insertedCount" title="检索修改行数">
+            <p>某些数据库返回 CRUD 操作插入、更新或删除的行数。
+                对于 <code>.insert()</code>、<code>.upsert()</code> 和 <code>.replace()</code>，此值可以通过
+                语句类属性 <code>insertedCount</code> 访问：</p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ModifiedRowsExamples.kt"
+                        include-symbol="insertStatement, rowCount"
+            />
+        </chapter>
+        <chapter title="从修改行返回数据" id="returning-data-from-modified-rows">
+            <tldr>
+                <p>支持的数据库：PostgreSQL、SQLite 和 MariaDB（仅限插入和删除）</p>
+            </tldr>
+            <p>
+                某些数据库允许在每次插入、更新或删除行时返回额外数据。
+                这可以通过使用以下函数之一来实现：
+            </p>
+            <list>
+                <li>
+                    <code>.insertReturning()</code> (
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/insert-returning.html">
+                        <code>JDBC</code>
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/insert-returning.html">
+                    <code>R2DBC</code>
+                </a>)
+                </li>
+                <li>
+                    <code>.upsertReturning()</code> (
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/upsert-returning.html">
+                        <code>JDBC</code>
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/upsert-returning.html">
+                    <code>R2DBC</code>
+                </a>)
+                </li>
+                <li>
+                    <code>.updateReturning()</code> (
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/update-returning.html">
+                        <code>JDBC</code>
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/update-returning.html">
+                    <code>R2DBC</code>
+                </a>)
+                </li>
+                <li>
+                    <code>.deleteReturning()</code> (
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/delete-returning.html">
+                        <code>JDBC</code>
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/delete-returning.html">
+                    <code>R2DBC</code>
+                </a>)
+                </li>
+            </list>
+            <p>
+                它们每个都接受所需表列的列表作为参数。如果未提供，默认将返回所有表列：
+            </p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ModifiedRowsExamples.kt"
+                        include-symbol="createdProjects, updatedBudgets"
+            />
+            <note>
+                与这些 CRUD 操作的基础变体不同，<code>ReturningStatement</code> 的行为类似于
+                <code>Query</code>，因为它也扩展了 <code>Iterable</code>，
+                因此在第一次尝试迭代其结果之前，它不会被数据库执行。
+            </note>
+        </chapter>
+    </chapter>
+    <chapter title="更新" id="update">
+        <chapter title="更新记录" id="update-record">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/update.html">
+                    <code>update</code> (JDBC)
+                </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/update.html">
+                    <code>update</code> (R2DBC)
+                </a>
+                </p>
+            </tldr>
+            <p>
+                要更新记录，请使用 <code>.update()</code> 函数。默认情况下，它返回更新的
+                行数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/UpdateExamples.kt"
+                        include-symbol="updatedRowCount"
+            />
+            <p>要使用表达式（例如递增）更新列值，您可以使用
+                <code>.update()</code> 函数或 <code>update</code> 设置器：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/UpdateExamples.kt"
+                        include-symbol="updatedRowsWithIncrement"
+            />
+        </chapter>
+        <chapter title="插入或更新" id="insert-or-update">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/upsert.html">
+                    <code>upsert</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/upsert.html">
+                        <code>upsert</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>
+                插入或更新（Upsert）是一种数据库操作，它要么插入新行，要么在存在重复约束时更新现有行。
+                <code>.upsert()</code> 的支持功能取决于所使用的特定数据库。
+                例如，MySQL 的 <code>INSERT ... ON DUPLICATE KEY UPDATE</code> 语句会自动评估
+                主键和唯一索引以检测重复值，因此在 Exposed 中使用该函数如下所示：
+            </p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/UpdateOrInsertExamples.kt"
+                        include-lines="14-25"
+            />
+            <p>
+                如果未向 <code>.upsert()</code> 提供任何可选参数，并且省略了 <code>onUpdate</code> 块，
+                则 <code>body</code> 块中的语句将用于操作的插入和更新部分。
+                这意味着，例如，如果表映射具有默认值的列，并且这些列在 <code>body</code> 块中被省略，
+                则默认值将用于插入以及更新操作。
+            </p>
+            <note>
+                如果更新操作应与插入操作不同，则应向 <code>onUpdate</code> 提供参数以设置要更新的特定列，如下例所示。
+                <p>
+                    如果更新操作涉及应使用原本要插入的值的函数，
+                    则应使用 <code>insertValue()</code> 标记这些列，如下例所示。
+                </p>
+            </note>
+            <p>
+                使用另一个示例，PostgreSQL 允许更多控制要检查哪些键约束列的
+                冲突，是否应使用不同的值进行更新，以及更新语句
+                是否应具有 <code>WHERE</code> 子句：
+            </p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/UpdateOrInsertExamples.kt"
+                        include-lines="29-47"
+            />
+            <p>如果更新操作应与插入操作相同，但排除少数几列，
+                则应向 <code>onUpdateExclude</code> 提供参数，指定要排除的特定列。
+                此参数也可用于反向情况，即只应更新一小部分列
+                但复制插入值很繁琐：</p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/UpdateOrInsertExamples.kt"
+                        include-lines="51-65"
+            />
+            <p>如果特定数据库支持用户定义的键列且未提供，则使用表的主键。如果没有
+                定义的主键，则使用第一个唯一索引。如果没有唯一索引，每个数据库
+                会以不同方式处理此情况，因此强烈建议定义键以避免意外结果。</p>
+            <note>
+                不支持特定插入或更新命令的数据库使用标准的 <code>MERGE INTO
+                ... USING</code> 语句，带有别名和派生表列列表。
+                这些包括 Oracle、SQL Server 和 H2 兼容模式（MySQL 模式除外）。
+                定义为键约束（用于 <code>ON</code> 子句）的任何列都必须包含在语句块中以避免抛出错误。
+            </note>
+        </chapter>
+
+        <chapter title="替换" id="replace">
+            <tldr>
+                <p>支持的数据库：SQLite、MySQL 和 MariaDB </p>
+                    <p>
+                        API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/replace.html">
+                        <code>replace</code> (JDBC)
+                        </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/replace.html">
+                            <code>replace</code> (R2DBC)
+                        </a>
+                    </p>
+            </tldr>
+            <p>
+                <code>.replace()</code> 方法的行为类似于 <code>.upsert()</code>。唯一的
+                区别是，如果插入会违反唯一约束，则在插入新行之前会删除现有行。
+            </p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReplaceExamples.kt"
+                        include-lines="29-42"
+            />
+            <p>与 <code>.upsert()</code> 不同，没有任何支持的数据库允许 <code>WHERE</code> 子句。
+                此外，用于评估违规的约束仅限于主键和唯一索引，因此没有用于自定义键集的参数。</p>
+            <p>语句块中指定的值将用于插入语句，任何省略的列将设置为其默认值（如果适用）。</p>
+            <p>
+                在上面的示例中，如果原始行是使用用户定义的 <code>rating</code> 插入的，并且使用省略了 <code>rating</code> 列的
+                块执行了 <code>.replace()</code>，
+                则新插入的行将存储默认评分值。这是因为旧行首先被完全删除了。
+            </p>
+            <p><code>REPLACE INTO ... SELECT </code> SQL 子句可以通过向 <code>.replace()</code> 提供查询来使用：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReplaceExamples.kt"
+                        include-lines="46-49"
+            />
+            <p>默认情况下，它将尝试按照 <code>Table</code> 实例中定义的顺序插入到所有非自增 <code>Table</code> 列中。
+                如果需要指定列或更改顺序，请将列列表作为第二个参数提供：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/ReplaceExamples.kt"
+                        include-lines="53-65"
+            />
+        </chapter>
+    </chapter>
+    <chapter title="删除" id="delete">
+        <chapter title="带条件删除" id="deleteWhere">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/delete-where.html">
+                    <code>deleteWhere</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/delete-where.html">
+                        <code>deleteWhere</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>
+                要删除记录并返回删除的行数，请使用 <code>.deleteWhere()</code>
+                函数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/DeleteExamples.kt"
+                        include-symbol="deletedRowsCount"
+            />
+        </chapter>
+        <chapter title="删除并忽略" id="deleteIgnoreWhere">
+            <tldr>
+                <p>支持的数据库：MySQL 和 MariaDB</p>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/delete-ignore-where.html">
+                    <code>deleteIgnoreWhere</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/delete-ignore-where.html">
+                        <code>deleteIgnoreWhere</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>
+                要在删除记录时忽略过程中可能发生的任何错误，请使用
+                <code>.deleteIgnoreWhere()</code> 函数。该函数将返回删除的行数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/DeleteExamples.kt"
+                        include-symbol="deleteIgnoreRowsCount"
+            />
+        </chapter>
+        <chapter title="删除所有" id="deleteAll">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/delete-all.html">
+                    <code>deleteAll</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/delete-all.html">
+                        <code>deleteAll</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>要删除表中的所有行并返回删除的行数，请使用 <code>.deleteAll()</code>
+                函数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/DeleteExamples.kt"
+                        include-symbol="allDeletedRowsCount"
+            />
+        </chapter>
+        <chapter title="连接删除" id="join-delete">
+            <tldr>
+                <p>
+                    API 参考：<a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/delete.html">
+                    <code>delete</code> (JDBC)
+                    </a>，<a href="https://jetbrains.github.io/Exposed/api/exposed-r2dbc/org.jetbrains.exposed.v1.r2dbc/delete.html">
+                        <code>delete</code> (R2DBC)
+                    </a>
+                </p>
+            </tldr>
+            <p>要从连接关系中的表删除记录，请使用以 <code>Join</code> 作为接收者的 <code>.delete()</code> 函数。将应删除记录的特定表作为
+                <code>targetTable</code> 参数的参数提供。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/DeleteExamples.kt"
+                        include-symbol="join,deletedActorsCount"
+            />
+            <tip>
+                有关创建和使用 <code>Join</code> 的更多信息，请参阅
+                <a href="DSL-Joining-tables.topic">
+                    连接表
+                </a>
+                。</tip>
+        </chapter>
+
+    </chapter>
+
+</topic>

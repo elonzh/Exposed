@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+    SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="向量" id="Vector-types">
+    <show-structure for="chapter" depth="2"/>
+    <tldr>
+        <p>
+            <b>必需依赖</b>: <code>org.jetbrains.exposed:exposed-core</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-supported"/>
+    </tldr>
+    <p>
+        Exposed 提供对向量数据类型的支持，允许你在数据库中直接存储和查询高维嵌入，
+        以及运行 AI 驱动的相似性搜索。Oracle、SQL Server、MySQL 和 MariaDB
+        都支持显式向量类型，PostgreSQL 通过开源扩展
+        <a href="https://github.com/pgvector/pgvector">pgvector</a> 提供该类型。
+    </p>
+
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            <code>exposed-core</code> 模块支持三种主要方式来使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/vector.html">
+                <code>.vector()</code>
+            </a>
+            方法定义向量列：
+        </p>
+        <list>
+            <li>
+                <p>最常见的向量定义，接受 <code>FloatArray</code> 值并允许你定义维度：</p>
+                <code-block lang="kotlin">
+                    val embedding = vector("embedding", dimensions = 3)
+                </code-block>
+                如果你的数据库支持显式格式，这将设置维度格式为使用 32 位浮点数。
+            </li>
+            <li>
+                <p>带类型推断的向量定义，设置底层格式。目前，唯一可用的选项是 <code>FloatArray</code> 和 <code>IntArray</code>：</p>
+                <code-block lang="kotlin"><![CDATA[
+                    val embedding = vector<IntArray>("embedding", 99)
+                ]]></code-block>
+                默认情况下，<code>FloatArray</code> 将设置 32 位浮点数格式，而 <code>IntArray</code>
+                将设置 8 位整数格式。
+            </li>
+            <li>
+                <p>完整的向量定义，可控制接受的输入类型、维度和底层格式：</p>
+                <code-block lang="kotlin"><![CDATA[
+                    val embedding = vector<FloatArray>("embedding", 2049, VectorFormat.FLOAT64)
+                ]]></code-block>
+                例如，当需要替代浮点格式时（如 64 位数字），这很有用。
+            </li>
+        </list>
+        <note>
+            <p>可以向 <code>dimensions</code> 参数传递 <code>null</code> 值，以定义具有可变长度向量的列。
+                但并非所有数据库都支持此功能。请在选择之前检查你的文档。</p>
+        </note>
+    </chapter>
+
+    <chapter title="基本用法" id="basic-usage">
+        <p>
+            向量列以 Kotlin 原始数组（<code>FloatArray</code> 或 <code>IntArray</code>）的形式存储和检索数据，
+            为代码中的向量数据操作提供自然的方式。
+        </p>
+        <p>你可以在表定义中定义向量列，如下所示：</p>
+        <code-block lang="kotlin"><![CDATA[
+            object MultipleVectors : Table("multiple_vectors") {
+                val ve1 = vector("ve1", dimensions = 3)
+                val ve2 = vector<IntArray>("ve2", 3)
+                val ve3 = vector<FloatArray>("ve3", 3, format = VectorFormat.FLOAT64)
+            }
+        ]]></code-block>
+        <p>以下是向向量列插入数据的示例：</p>
+        <code-block lang="kotlin"><![CDATA[
+            MultipleVectors.insert {
+                it[ve1] = floatArrayOf(1f, 0f, 0f)
+                it[ve2] = intArrayOf(10, 11, 12)
+                it[ve3] = floatArrayOf(0.234f, 0.345f, 0.567f)
+            }
+        ]]></code-block>
+    </chapter>
+    <chapter title="PostgreSQL 用法" id="postgresql-vectors">
+        <p>PostgreSQL 通过安装 <a href="https://github.com/pgvector/pgvector">pgvector</a>
+        扩展提供对向量数据类型的支持。Exposed 假定此扩展已在表创建或使用向量列之前的某个时刻启用：</p>
+        <code-block lang="sql">
+            CREATE EXTENSION IF NOT EXISTS vector;
+        </code-block>
+        <p>如果不是这种情况，使用该列将导致数据库异常。</p>
+    </chapter>
+
+    <chapter title="向量函数" id="vector-functions">
+        <p>Exposed 提供向量距离函数，结果基于以下距离相似性选项计算：</p>
+        <list>
+            <li>余弦</li>
+            <li>欧几里得</li>
+            <li>点积</li>
+        </list>
+        <p>以下是使用距离函数查询向量数据的示例：</p>
+        <code-block lang="kotlin">
+            val distance = MultipleVectors.ve1.cosineDistance(floatArrayOf(0f, 1f, 0f)).alias("cd")
+            MultipleVectors
+                .select(distance)
+                .where { MultipleVectors.ve2.euclideanDistance(intArrayOf(1, 1, 1)) less 5 }
+                .orderBy(distance to SortOrder.ASC)
+                .toList()
+        </code-block>
+        <note>
+            <p>并非所有数据库都支持所有可用的距离度量。请在使用之前检查你的文档。</p>
+        </note>
+    </chapter>
+</topic>

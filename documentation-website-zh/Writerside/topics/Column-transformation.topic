@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="列转换" id="Column-transformation">
+     <p>列转换允许定义数据库列类型与应用程序数据类型之间的自定义转换。
+             当您需要以一种格式存储数据但在应用程序中以另一种格式使用时，这尤其有用。
+     </p>
+    <p>考虑以下示例，我们定义一个表来存储用餐时间并将这些时间转换为用餐类型：</p>
+
+    <code-block lang="kotlin">
+        enum class Meal {
+            BREAKFAST,
+            LUNCH,
+            DINNER
+        }
+
+        object Meals : Table() {
+            val mealTime: Column&lt;Meal&gt; = time(&quot;meal_time&quot;)
+                .transform(
+                    wrap = {
+                        when {
+                            it.hour &lt; 10 -&gt; Meal.BREAKFAST
+                            it.hour &lt; 15 -&gt; Meal.LUNCH
+                            else -&gt; Meal.DINNER
+                        }
+                    },
+                    unwrap = {
+                        when (it) {
+                            Meal.BREAKFAST -&gt; LocalTime(8, 0)
+                            Meal.LUNCH -&gt; LocalTime(12, 0)
+                            Meal.DINNER -&gt; LocalTime(18, 0)
+                        }
+                    }
+                )
+        }
+    </code-block>
+    <p>
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/transform.html">
+            <code>.transform()</code>
+        </a>
+        函数用于对 <code>mealTime</code> 列应用自定义转换：
+    </p>
+    <list>
+        <li><code>wrap()</code> 函数将存储的 <code>LocalTime</code> 值转换为
+            <code>Meal</code> 枚举。它检查存储时间的小时数并返回相应的用餐类型。
+        </li>
+        <li><code>unwrap()</code> 函数将 <code>Meal</code> 枚举转换回 <code>LocalTime</code>
+            值以存储在数据库中。
+        </li>
+    </list>
+    <p>转换也可以定义为
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-column-transformer/index.html">
+            <code>ColumnTransformer</code>
+        </a>
+        接口的实现，并在不同表之间重用：
+    </p>
+
+    <code-block lang="kotlin">
+        class MealTimeTransformer : ColumnTransformer&lt;LocalTime, Meal&gt; {
+            override fun wrap(value: LocalTime): Meal = when {
+                value.hour &lt; 10 -&gt; Meal.BREAKFAST
+                value.hour &lt; 15 -&gt; Meal.LUNCH
+                else -&gt; Meal.DINNER
+            }
+
+            override fun unwrap(value: Meal): LocalTime = when (value) {
+                Meal.BREAKFAST -&gt; LocalTime(8, 0)
+                Meal.LUNCH -&gt; LocalTime(12, 0)
+                Meal.DINNER -&gt; LocalTime(18, 0)
+            }
+        }
+
+        object Meals : Table() {
+            val mealTime: Column&lt;Meal&gt; = time(&quot;meal_time&quot;).transform(MealTimeTransformer())
+        }
+    </code-block>
+
+    <note>
+        请注意，这些转换会在每次访问表列时发生。
+        因此，为了保持性能效率，建议在此上下文中避免繁重的转换。
+    </note>
+
+    <chapter title="空值转换" id="null-transform">
+        <p>
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/null-transform.html">
+                <code>.nullTransform()</code>
+            </a>
+            方法应用一种特殊转换，允许非空数据库列在客户端接受和/或返回 <code>null</code> 值。
+        </p>
+
+        <p>
+            此转换不会改变数据库中列的定义，
+            数据库中仍然是 <code>NON NULL</code>。它能够将数据库中的非空值在 Kotlin 中反映为 <code>null</code>
+            （例如，将非空文本列中的空字符串、空列表、负 ID 等转换为 <code>null</code>）。
+        </p>
+
+        <code-block lang="kotlin">
+        class MealTimeNullTransformer : ColumnTransformer&lt;LocalTime, Meal?&gt; {
+            override fun wrap(value: LocalTime): Meal? = when {
+                value.hour == 0 &amp;&amp; value.minute == 0 -&gt; null
+                value.hour &lt; 10 -&gt; Meal.BREAKFAST
+                value.hour &lt; 15 -&gt; Meal.LUNCH
+                else -&gt; Meal.DINNER
+            }
+
+            override fun unwrap(value: Meal?): LocalTime = when (value) {
+                Meal.BREAKFAST -&gt; LocalTime(8, 0)
+                Meal.LUNCH -&gt; LocalTime(12, 0)
+                Meal.DINNER -&gt; LocalTime(18, 0)
+                else -&gt; LocalTime(0, 0)
+            }
+        }
+
+        object Meals : Table() {
+            val mealTime: Column&lt;Meal?&gt; = time(&quot;meal_time&quot;).nullTransform(MealTimeNullTransformer())
+        }
+    </code-block>
+    </chapter>
+</topic>

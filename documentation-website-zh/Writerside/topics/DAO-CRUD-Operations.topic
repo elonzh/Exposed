@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="CRUD 操作" id="DAO-CRUD-Operations">
+    <show-structure for="chapter,procedure" depth="2"/>
+    <tldr>
+        <p>
+            <b>必需的依赖</b>: <code>org.jetbrains.exposed:exposed-dao</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-not-supported"/>
+    </tldr>
+    <p>
+        CRUD（创建、读取、更新、删除）是任何数据库支持的四种基本操作。本节演示如何使用 Exposed 的 DAO（数据访问对象）API 执行 SQL CRUD 操作。
+    </p>
+    <p>
+        这些操作可以直接通过与表关联的
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/index.html">
+            <code>EntityClass</code>
+        </a>
+        的方法和属性来执行。有关更多信息，请参见 <a href="DAO-Entity-definition.topic"/>。
+    </p>
+    <chapter title="创建" id="create">
+        <p>
+            要创建新的表行，请在与表关联的实体类（本例中为 <code>StarWarsFilmEntity</code>）上使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/new.html">
+                <code>.new()</code>
+            </a>
+            函数：
+        </p>
+        <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                    include-symbol="movie"/>
+        <p>
+            在上面的示例中，<code>movie</code> 将是链接到 <code>StarWarsFilmsTable</code> 表中新行的
+            <a href="DAO-Entity-definition.topic">
+                实例
+            </a>
+            。
+        </p>
+        <p>
+            要为新实体提供手动 <code>id</code> 值，请将该值作为参数传递给 <code>id</code> 参数：
+        </p>
+        <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                    include-symbol="movie2"/>
+        <p>
+            如果实体是 <code>CompositeEntity</code>，可以通过使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-composite-i-d/index.html">
+                <code>CompositeID</code>
+            </a>
+            类创建组件列到值的关联来构造 ID 值：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/CreateExamples.kt"
+                    include-symbol="directorId, director"/>
+        <p>
+            如果 <code>CompositeID</code> 包含自增或自动生成的列，则不需要在 <code>CompositeID</code> 构建块中提供这些列的值。在这种情况下，它们将由数据库正常生成。
+        </p>
+    </chapter>
+    <chapter title="读取" id="read">
+        <p>
+            要从属性读取值，只需像访问 Kotlin 类中的任何属性一样访问它：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-symbol="movieName"/>
+        <note>
+            实体的 <code>id</code> 属性被包装为 <code>EntityID</code> 类的实例。
+            要访问实际的包装值，例如从 <code>StarWarsFilm</code> 实例中获取存储的 <code>Int</code>，请使用 <code>EntityID.value</code>：
+            <code-block lang="kotlin"
+                        src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-symbol="movieId"/>
+        </note>
+        <p>要检索实体，请使用以下方法之一：</p>
+            <chapter title="检索全部" id="read-all">
+                要获取与此实体类关联的所有实体实例，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/all.html">
+                    <code>.all()</code>
+                </a>
+                函数：
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                            include-symbol="allMovies"/>
+            </chapter>
+            <chapter title="按条件查找" id="find-all">
+                要获取所有符合条件表达式的实体实例，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/find.html">
+                    <code>.find()</code>
+                </a>
+                函数：
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                            include-symbol="specificMovie"/>
+            </chapter>
+            <chapter title="按 ID 查找" id="find-by-id">
+                要通过 ID 值获取实体，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/find-by-id.html">
+                    <code>.findById()</code>
+                </a>
+                函数：
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                            include-symbol="movie"/>
+            </chapter>
+        <p>
+            如果实体是 <code>CompositeEntity</code>，其 <code>id</code> 属性可用于引用所有复合列并获取实体，
+            类似于其关联的 <code>CompositeIdTable</code> 的 <code>id</code> 列：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-symbol="directorId, director, directors"/>
+        <p>
+            SQL 查询将产生类似以下的结果：
+        </p>
+        <code-block lang="sql"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-lines="74-77"/>
+        <tip>
+            有关可用谓词的列表，请参见
+            <a href="DSL-Querying-data.topic" anchor="where-expression">DSL Where 表达式</a>。
+        </tip>
+        <chapter title="通过联接读取实体" id="read-entity-with-a-join-to-another-table">
+            <p>假设您想查找所有给第二部星球大战电影评分大于 5 的用户。
+                首先，您需要使用 Exposed DSL 编写该查询。</p>
+
+            <code-block lang="kotlin"
+                        src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-symbol="query"/>
+            <p>
+                一旦查询定义完成，您可以使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/wrap-rows.html">
+                    <code>.wrapRows()</code>
+                </a>
+                函数将结果包装在 <code>User</code> 实体中，从检索到的数据生成实体：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                        include-symbol="users"/>
+        </chapter>
+        <chapter title="排序结果" id="sort-by">
+            <p>
+                <code>.all()</code> 函数返回一个 <code>SizedIterable</code>，它存储了与调用实体类关联的所有实体实例。<code>SizedIterable</code> 实现了 Kotlin <code>Iterable</code> 接口，允许调用
+                <a href="https://kotlinlang.org/api/core/kotlin-stdlib/">
+                    Kotlin 标准库
+                </a>
+                中的任何排序方法。
+            </p>
+            <chapter title="升序" id="sortedBy">
+                <p>
+                    要按升序对结果排序，请使用
+                    <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sorted-by.html">
+                        <code>.sortedBy()</code>
+                    </a>
+                    函数：
+                </p>
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                            include-symbol="moviesByAscOrder"/>
+            </chapter>
+            <chapter title="降序" id="sortedByDescending">
+                <p>
+                    要按降序对结果排序，请使用
+                    <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sorted-by-descending.html">
+                        <code>.sortedByDescending()</code>
+                    </a>
+                    函数：
+                </p>
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                            include-symbol="moviesByDescOrder"/>
+            </chapter>
+        </chapter>
+    </chapter>
+    <chapter title="更新" id="update">
+        <p>
+            您可以像更新 Kotlin 类中的任何属性一样更新属性的值：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/UpdateExamples.kt"
+                    include-lines="16"/>
+        <note>
+            Exposed 在您为 <code>Entity</code> 设置新值时不会立即更新，只是将其存储在内部映射中。
+            "刷新"值到数据库发生在事务结束时，或在下一次数据库 <code>SELECT *</code> 之前。
+        </note>
+        <chapter title="按 ID 更新" id="findByIdAndUpdate">
+            <p>
+                要按 ID 搜索实体并应用更新，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/find-by-id-and-update.html">
+                    <code>.findByIdAndUpdate()</code>
+                </a>
+                函数：
+            </p>
+            <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/examples/UpdateExamples.kt" include-symbol="updatedMovie"/>
+        </chapter>
+        <chapter title="使用查询更新" id="findSingleByAndUpdate">
+            <p>
+                要通过查询搜索单个实体并应用更新，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/find-single-by-and-update.html">
+                    <code>.findSingleByAndUpdate()</code>
+                </a>
+                函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao/src/main/kotlin/org/example/examples/UpdateExamples.kt"
+                        include-symbol="updatedMovie2"/>
+        </chapter>
+
+    </chapter>
+    <chapter title="删除" id="delete">
+        <p>
+            要删除记录，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity/delete.html">
+                <code>.delete()</code>
+            </a>
+            函数：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/DeleteExamples.kt"
+                    include-lines="16"/>
+    </chapter>
+
+    <chapter title="将查询用作表达式" id="use-queries-as-expressions">
+        <p>
+            假设您想按每个城市的用户数对城市进行排序。为此，您可以编写一个子查询来计算每个城市的用户数，
+            然后按该计数对结果排序。但要做到这一点，您需要将
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-query/index.html">
+                <code>Query</code>
+            </a>
+            转换为
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-expression/index.html">
+                <code>Expression</code>
+            </a>
+            。
+        </p>
+        <p>
+            这可以使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/wrap-as-expression.html">
+                <code>wrapAsExpression()</code>
+            </a>
+            函数来完成：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-symbol="expression, cities"/>
+    </chapter>
+
+    <chapter title="向实体类添加计算字段" id="add-computed-fields-to-entity-class">
+        <p>
+            假设您想在每次获取实体时使用窗口函数对电影进行排名。实体类的伴生对象可以重写 <code>EntityClass</code> 中的任何开放函数。但要实现此功能，您只需重写
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/search-query.html">
+                <code>searchQuery()</code>
+            </a>
+            函数。然后可以通过实体类的属性访问该函数的结果：</p>
+        <tabs>
+            <tab id="entity-class" title="StarWarsFilmWithRankEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/entities/StarWarsFilmWithRankEntity.kt"/>
+            </tab>
+            <tab id="table-definition" title="StarWarsFilmsWithRankTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao/src/main/kotlin/org/example/tables/StarWarsFilmsWithRankTable.kt"/>
+            </tab>
+        </tabs>
+        <p>
+            然后，创建和获取实体将如下所示：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-symbol="readComputedField"/>
+    </chapter>
+
+    <chapter title="实体变更时自动填充列" id="auto-fill-columns-on-entity-change">
+        <p>
+            假设您需要所有表对象至少有两个列来存储记录创建和修改的日期和时间。您可以定义一个 <code>BaseTable</code> 来自动处理将这些列注册到任何继承此抽象类的表。还可以定义一个抽象的 <code>BaseEntity</code> 来自动将字段关联到相关列：</p>
+        <tabs>
+            <tab id="abstract-base-table" title="BaseTable">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/BaseTable.kt"/>
+            </tab>
+            <tab id="abstract-base-entity" title="BaseEntity">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/BaseEntity.kt"/>
+            </tab>
+        </tabs>
+        <p>
+            每当实例化新实体时，<code>created</code> 列将被填充由
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-kotlin-datetime/org.jetbrains.exposed.v1.datetime/-current-date-time/index.html">
+                <code>CurrentDateTime</code>
+            </a>
+            定义的数据库默认值，而 <code>modified</code> 列将被填充空值。
+        </p>
+        <p>
+            然后可以订阅实体生命周期拦截器
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-hook/index.html">
+                <code>EntityHook</code>
+            </a>
+            ，以便在更新现有实体时自动填充 <code>modified</code> 字段：</p>
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/entities/BaseEntityClass.kt"/>
+        <p>
+            上面的示例在抽象的 <code>BaseEntityClass</code> 中调用 <code>EntityHook.subscribe()</code>，
+            该类可以用作任何 <code>BaseEntity</code> 实现的伴生对象，但拦截器也可以在事务级别订阅（和取消订阅）。</p>
+        <p>订阅仅在更新记录时执行操作（由 <code>EntityChangeType.Updated</code> 检测）。
+        </p>
+        <tip>
+            可以检测实体创建（<code>EntityChangeType.Created</code>）或删除（<code>EntityChangeType.Removed</code>）时的其他操作。
+        </tip>
+        <p>
+            当发生更新时，<code>modified</code> 列使用 <code>nowUTC()</code> 方法填充当前 UTC 时间。但是，更新仅在 <code>modified</code> 字段尚未设置时才发生。这是通过使用 <code>Entity.writeValues</code> 来检查的，它在刷新到数据库之前保存实体实例的列-值映射。执行此检查可确保填充 <code>modified</code> 列不会触发拦截器本身。
+        </p>
+        <p>
+            此外，每次更改（创建、更新或删除）都会使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/exposed-logger.html">
+                <code>exposedLogger</code>
+            </a>
+            记录日志。
+        </p>
+        <tip>
+            有关使用语句拦截器的更多详细信息，请参见
+            <a href="Statement-Interceptors.md">DSL 语句拦截器</a>。
+        </tip>
+    </chapter>
+
+</topic>

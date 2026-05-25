@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="使用序列" id="Working-with-Sequence">
+    <show-structure for="chapter,procedure" depth="2"/>
+    <p>序列是一个数据库对象，它按顺序自动生成整数值。它在生成唯一标识符和主键时特别有用。</p>
+    <chapter title="定义序列" id="define-a-sequence">
+        要在 Exposed 中定义序列，请使用
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-sequence/index.html">
+            <code>Sequence</code>
+        </a>
+        类：
+        <code-block lang="Kotlin">
+            val myseq = Sequence("my_sequence") // my_sequence is the sequence name.
+        </code-block>
+        <p>
+            可以指定多个参数来控制序列的属性：
+        </p>
+        <code-block lang="Kotlin">
+            private val myseq = Sequence(
+                name = &quot;my_sequence&quot;,
+                startWith = 4,
+                incrementBy = 2,
+                minValue = 1,
+                maxValue = 10,
+                cycle = true,
+                cache = 20
+            )
+        </code-block>
+    </chapter>
+    <chapter title="创建序列" id="create-a-sequence">
+        要创建序列，请使用
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/create-sequence.html">
+            <code>.createSequence()</code>
+        </a>
+        方法，该方法由
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/index.html">
+            <code>SchemaUtils</code>
+        </a>
+        提供：
+        <code-block lang="Kotlin">
+            SchemaUtils.createSequence(myseq)
+        </code-block>
+    </chapter>
+    <chapter title="删除序列" id="drop-a-sequence">
+        要删除序列，请使用
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/drop-sequence.html">
+            <code>.dropSequence()</code>
+        </a>
+        方法，该方法由
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/index.html">
+            <code>SchemaUtils</code>
+        </a>
+        提供：
+        <code-block lang="Kotlin">
+            SchemaUtils.dropSequence(myseq)
+        </code-block>
+    </chapter>
+    <chapter title="访问下一个值" id="access-next-value">
+        <p>
+            你可以使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/next-int-val.html">
+                <code>.nextIntVal()</code>
+            </a>
+            函数访问序列中的下一个值：
+        </p>
+        <code-block lang="Kotlin">
+            val nextVal = myseq.nextIntVal()
+            val id = StarWarsFilms.insertAndGetId {
+                it[id] = nextVal
+                it[name] = &quot;The Last Jedi&quot;
+                it[sequelId] = 8
+                it[director] = &quot;Rian Johnson&quot;
+            }
+        </code-block>
+
+        <code-block lang="Kotlin">
+            val firstValue = StarWarsFilms.select(nextVal).single()[nextVal]
+        </code-block>
+    </chapter>
+</topic>

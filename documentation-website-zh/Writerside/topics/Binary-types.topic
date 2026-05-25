@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="二进制" id="Binary-types">
+    <show-structure for="chapter" depth="2" />
+    <tldr>
+        <p>
+            <b>必需的依赖</b>: <code>org.jetbrains.exposed:exposed-core</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-limited-support"/>
+    </tldr>
+
+    <p>
+        Exposed 通过 <code>ExposedBlob</code> 类型提供对存储和处理二进制数据的支持，
+        该类型使用 <code>InputStream</code> 高效地包装二进制内容。这种方法确保在处理大型二进制对象时实现最佳内存使用。
+    </p>
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            <code>exposed-core</code> 模块提供以下二进制类型：
+        </p>
+        <deflist type="medium">
+            <def id="blob-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/blob.html">
+                        <code>blob()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>BLOB</code>（或根据数据库而定的等效类型）。用于存储任意大小的二进制对象。</p>
+                <p>数据库特定映射：</p>
+                <list type="bullet">
+                    <li>PostgreSQL：映射到 <code>bytea</code></li>
+                    <li>SQLServer：映射到 <code>VARBINARY(MAX)</code></li>
+                </list>
+            </def>
+
+            <def id="binary-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/binary.html">
+                        <code>binary()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>VARBINARY</code>。有两种形式：</p>
+                <list type="bullet">
+                    <li>
+                        简单版本：仅接受列名参数，映射到具有数据库特定默认长度的 <code>VARBINARY</code>。
+                        <code-block lang="kotlin"
+                                    src="exposed-data-types/src/main/kotlin/org/example/examples/BinaryExamples.kt"
+                                    include-symbol="simpleData"
+                        />
+                        <p>数据库特定映射：</p>
+                        <list type="bullet">
+                            <li>PostgreSQL：映射到 <code>bytea</code></li>
+                            <li>SQLite：映射到 <code>BLOB</code></li>
+                            <li>SQLServer、MySQL 和 Oracle：不支持</li>
+                        </list>
+                    </li>
+                    <li>
+                        指定长度版本：接受名称和长度参数，映射到 <code>VARBINARY(MAX)</code>，
+                        其中 <code>MAX</code> 是指定的最大长度。用于存储固定大小的二进制数据。
+                        <code-block lang="kotlin"
+                                    src="exposed-data-types/src/main/kotlin/org/example/examples/BinaryExamples.kt"
+                                    include-symbol="thumbnail"
+                        />
+                        <p>数据库特定映射：</p>
+                        <list type="bullet">
+                            <li>PostgreSQL：映射到 <code>bytea</code></li>
+                            <li>Oracle：如果提供的长度小于 2000，则映射到 <code>RAW</code>，否则不支持。</li>
+                        </list>
+                    </li>
+                </list>
+            </def>
+        </deflist>
+    </chapter>
+    <chapter title="基本用法" id="basic-usage">
+        <p>以下是在表定义中使用二进制类型的简单示例：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/BinaryExamples.kt"
+                    include-symbol="Files"
+        />
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/BinaryExamples.kt"
+                    include-lines="28-47,51"
+        />
+    </chapter>
+    <chapter title="PostgreSQL 对象标识符" id="object-identifiers">
+        <tldr>
+            <include from="lib.topic" element-id="r2dbc-not-supported"/>
+        </tldr>
+        <p>PostgreSQL 支持使用对象标识符（OID）存储大对象：</p>
+        <code-block lang="kotlin">
+        val content = blob("content", useObjectIdentifier = true)
+        </code-block>
+        <note>
+            <p>
+                此功能仅适用于 PostgreSQL，如果与其他数据库一起使用将抛出 <code>IllegalStateException</code>。</p>
+        </note>
+    </chapter>
+</topic>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="枚举类型" id="Enumeration-types">
+    <show-structure for="chapter" depth="2" />
+    <tldr>
+        <p>
+            <b>必需的依赖项</b>：<code>org.jetbrains.exposed:exposed-core</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-limited-support"/>
+    </tldr>
+
+    <p>
+        Exposed 提供了多种在数据库表中使用枚举值的方式。您可以按枚举值的序数值或名称存储枚举值，
+        还支持数据库特定的枚举类型。这种灵活性允许您为使用场景选择最合适的存储方法。
+    </p>
+
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            要创建枚举列，请使用以下函数之一：
+        </p>
+        <deflist type="medium">
+            <def id="enumeration-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/enumeration.html">
+                        <code>enumeration()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>INT</code>。使用枚举值的序数值存储。</p>
+                <code-block lang="kotlin"
+                            src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                            include-symbol="enumOrdinal"
+                />
+            </def>
+            <def id="enumerationByName-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/enumeration-by-name.html">
+                        <code>enumerationByName()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>VARCHAR</code>。使用枚举值的名称存储。</p>
+                <code-block lang="kotlin"
+                            src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                            include-symbol="enumName"
+                />
+            </def>
+            <def id="customEnumeration-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/custom-enumeration.html">
+                        <code>customEnumeration()</code>
+                    </a>
+                </title>
+                <p>用于处理数据库特定的枚举类型。受 MySQL、PostgreSQL 和 H2 数据库支持。</p>
+            </def>
+        </deflist>
+    </chapter>
+    <chapter title="基本用法" id="basic-usage">
+        <p>以下是在表定义中使用枚举类型的方法：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                    include-lines="16-27"
+        />
+        <p>存储枚举数据：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                    include-lines="67-70,78-82"
+        />
+    </chapter>
+    <chapter title="自定义枚举" id="custom-enum">
+        <p>
+            某些数据库（如 MySQL、PostgreSQL 和 H2）支持显式枚举类型。由于仅使用 JDBC 元数据将此类
+            列与 Kotlin 枚举保持同步可能是一个挑战，Exposed 不提供自动管理此类列的功能，但这并不意味着您不能
+            使用此类列类型。
+        </p>
+        <p>
+            要处理枚举数据库类型，请使用以下方式之一的
+            <code>customEnumeration()</code>
+            函数：
+        </p>
+        <list type="decimal">
+            <li>
+                <a anchor="use-existing-col">使用现有的枚举列。</a>
+            </li>
+            <li>
+                <a anchor="create-new-col">创建新的 ENUM 列。</a>
+            </li>
+        </list>
+        <chapter title="使用现有列" id="use-existing-col">
+            <p>
+                当使用表中现有的枚举列时，<code>.customEnumeration()</code> 中的 <code>sql</code> 参数可以留为 <code>null</code>。
+            </p>
+            <p>
+                由于 JDBC 驱动程序可以为枚举类型提供/期望特定类，因此在定义自定义枚举时还必须提供 from/to
+                转换函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                        include-symbol="Foo, ExistingEnumTable"
+            />
+        </chapter>
+        <chapter title="创建新的 ENUM 列" id="create-new-col">
+            <p>
+                使用 Exposed，您还可以通过向 <code>.customEnumeration()</code> 中的 <code>sql</code> 参数提供原始定义 SQL 来创建新的 ENUM 列：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                        include-symbol="Foo, NewEnumTable"
+            />
+        </chapter>
+        <chapter title="PostgreSQL" id="postgresql">
+            <p>
+                PostgreSQL 要求将枚举定义为单独的类型，因此您必须在创建表之前创建它。这与某些其他数据库不同，在那些数据库中枚举可以在
+                表定义中内联定义。
+            </p>
+            <chapter title="JDBC" id="postgresql-jdbc">
+                <p>
+                    使用 JDBC 时，PostgreSQL 驱动程序为枚举值返回 <code>PGobject</code> 实例。
+                    因此，必须使用类型手动设置为枚举类型的 <code>PGobject</code> 作为 toDb 参数。您需要如下所示的辅助类：
+                </p>
+                <code-block lang="kotlin"
+                            src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                            include-symbol="PGEnum"
+                />
+            </chapter>
+            <p>枚举和表映射示例：</p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/EnumerationExamples.kt"
+                        include-symbol="Foo, EnumTable"
+            />
+            <chapter title="R2DBC" id="postgresql-r2dbc">
+                <p>
+                    使用 R2DBC 时，您必须在配置连接时
+                    <a href="https://github.com/pgjdbc/r2dbc-postgresql?tab=readme-ov-file#postgres-enum-types">
+                        注册枚举编解码器
+                    </a>。
+                    这在 <code>R2dbcDatabase.connect()</code> 步骤中完成，通过提供使用 <code>PostgresqlConnectionConfiguration.builder()</code> 和
+                    <code>codecRegistrar()</code> 的 PostgreSQL 特定连接工厂：
+                </p>
+                <code-block lang="Kotlin">
+                     val options = PostgresqlConnectionConfiguration.builder()
+                         .host("...")
+                         .username("...")
+                         .password("...")
+                         .database("...")
+                         // registered SQL enum name must match final name in database (PG always lower-case wrapped)
+                         .codecRegistrar(EnumCodec.builder().withEnum("fooenum", Foo::class.java).build())
+                         .build()
+                     val cxFactory = PostgresqlConnectionFactory(options)
+
+                     R2dbcDatabase.connect(
+                         connectionFactory = cxFactory,
+                         databaseConfig = R2dbcDatabaseConfig {
+                             explicitDialect = PostgreSQLDialect()
+                         }
+                     )
+                </code-block>
+                <p>注册编解码器后，表列映射如下所示：</p>
+                <code-block lang="Kotlin"><![CDATA[
+                    object EnumTable : Table() {
+                        val enumColumn: Column<Foo> = customEnumeration(
+                            name = "enumColumn",
+                            sql = "FooEnum",
+                            fromDb = { value -> Foo.valueOf(value as String) },
+                            toDb = { value -> value }
+                        )
+                    }
+                ]]></code-block>
+            </chapter>
+        </chapter>
+    </chapter>
+</topic>

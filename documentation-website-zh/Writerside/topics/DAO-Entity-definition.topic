@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+    SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="实体定义" id="DAO-Entity-definition">
+    <show-structure for="chapter,procedure" depth="2"/>
+    <tldr>
+        <p>
+            <b>必需的依赖</b>: <code>org.jetbrains.exposed:exposed-dao</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-not-supported"/>
+    </tldr>
+    <p>
+        Exposed 中的<a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity/index.html"><code>Entity</code></a>
+        将数据库表记录映射到 Kotlin 对象。这确保了类型安全，并允许您像处理普通 Kotlin 对象一样处理数据库记录，充分利用 Kotlin 的语言特性。
+    </p>
+    <p>
+        使用数据访问对象（DAO）方法时，<code>IdTable</code> 需要与 <code>Entity</code> 关联。这是因为该表中的每个数据库记录都需要映射到一个由主键标识的 <code>Entity</code> 实例。
+    </p>
+    <chapter id="defining-entity-class" title="定义实体">
+        <p>
+            您通过创建类来定义实体。
+            在以下示例中，<code>StarWarsFilmEntity</code> 是链接到表 <code>StarWarsFilmsTable</code> 的实体类：
+        </p>
+        <tabs>
+            <tab id="StarWarsFilmEntity" title="StarWarsFilmEntity">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"/>
+            </tab>
+            <tab id="StarWarsFilmsTable" title="StarWarsFilmsTable">
+                <include from="DAO-Table-Types.topic" element-id="StarWarsFilmsTable-dao-code-block"/>
+            </tab>
+        </tabs>
+        <chapter id="entity-type" title="实体类型">
+            <p>
+                实体类型决定了 <code>Entity</code> 类如何与表的主键交互。
+                由于 <code>StarWarsFilmsTable</code> 是 <code>IntIdTable</code>，<code>StarWarsFilmsEntity</code>
+                类继承自 <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-int-entity/index.html"><code>IntEntity</code></a>，
+                这表示 <code>StarWarsFilmsTable</code> 的 ID 和主键类型为 <code>Int</code>。
+            </p>
+            <p>
+                支持以下实体类型：
+            </p>
+            <deflist type="medium">
+                <def id="IntEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-int-entity/index.html">
+                            <code>IntEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>Int</code> 值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+                <def id="LongEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-long-entity/index.html">
+                            <code>LongEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>Long</code> 值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+                <def id="UIntEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-u-int-entity/index.html">
+                            <code>UIntEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>UInt</code> 值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+                <def id="ULongEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-u-long-entity/index.html">
+                            <code>ULongEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>ULong</code> 值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+                <def id="UuidEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-uuid-entity/index.html">
+                            <code>UuidEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>kotlin.uuid.Uuid</code> 值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+
+                <def id="JavaUUIDEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao.java/-u-u-i-d-entity/index.html">
+                            <code>UUIDEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由包装的 <code>java.util.UUID</code> 值组成的 ID 标识的实体实例的基类。可从 <code>org.jetbrains.exposed.v1.dao.java</code> 包获取。
+                    </p>
+                </def>
+                <def id="CompositeEntity">
+                    <title>
+                        <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-composite-entity/index.html">
+                            <code>CompositeEntity</code>
+                        </a>
+                    </title>
+                    <p>
+                        由多个包装值组成的 ID 标识的实体实例的基类。
+                    </p>
+                </def>
+            </deflist>
+        </chapter>
+        <chapter title="实体类" id="EntityClass">
+            <p>
+                <code>companion object</code> 块中的
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/index.html"><code>EntityClass</code></a>
+                负责管理 <code>Entity</code> 实例，例如创建、查询和删除记录。它还维护实体类（本例中的 <code>StarWarsFilmEntity</code>）与数据库表（<code>StarWarsFilmsTable</code>）之间的关系。
+            </p>
+            <p>每个实体类型都由相应的 <code>EntityClass</code> 支持，它接受以下参数：</p>
+            <deflist type="medium">
+                <def title="table" id="table-param">
+                    包含由此类管理的映射到实体的行的 <code>IdTable</code>。
+                </def>
+                <def title="entityType" id="entityType-param">
+                    （可选）<code>Entity</code> 类的预期类型。如果它是提供给此 <code>EntityClass</code> 实例的类型参数的类，则可以省略。
+                </def>
+                <def title="entityCtor" id="entityCtor-param">
+                    （可选）使用提供的 <code>EntityID</code> 实例化 <code>Entity</code> 的函数。
+                    如果未提供，则在首次访问时使用反射确定主构造函数（这可能会影响性能）。
+                </def>
+            </deflist>
+            <p>
+                在上面的示例中，伴生对象中指定了 <code>IntEntityClass</code>：
+            </p>
+            <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt" include-lines="9"/>
+            <p>
+                此设置使您能够使用 <code>IntEntityClass</code> 提供的函数来有效管理 <code>StarWarsFilmEntity</code> 的实例。
+            </p>
+        </chapter>
+        <chapter id="properties" title="属性">
+            <p>
+                表中的每一列在实体类中都表示为一个属性，其中 <code>by</code> 关键字确保在访问时从相应列获取或更新数据。
+            </p>
+            <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                        include-lines="10-13"/>
+        </chapter>
+        <p>
+            一旦定义了实体类，该类的实例允许您操作相应表中的单个记录。例如，通过
+            <a href="DAO-CRUD-Operations.topic" anchor="create">创建新记录</a>、
+            <a href="DAO-CRUD-Operations.topic" anchor="read">根据主键检索行</a>、
+            <a href="DAO-CRUD-Operations.topic" anchor="update">更新值</a> 或
+            <a href="DAO-CRUD-Operations.topic" anchor="delete">删除记录</a>。
+        </p>
+    </chapter>
+    <chapter title="不可变实体" id="immutable-entities">
+        <p>
+            对于定义不可变的实体，Exposed 提供了额外的
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-immutable-entity-class/index.html"><code>ImmutableEntityClass</code></a>
+            和
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-immutable-cached-entity-class/index.html"><code>ImmutableCachedEntityClass</code></a>
+            。
+        </p>
+        <p>
+            <code>ImmutableCachedEntityClass</code> 使用内部缓存按关联数据库存储实体加载状态。这确保实体更新与此类作为锁对象同步。
+        </p>
+        <p>
+            要创建不可变实体，请在实体类中使用 <code>ImmutableEntityClass</code> 或
+            <code>ImmutableCachedEntityClass</code> 作为伴生对象。例如，以下是定义 <code>CityEntity</code> 类的方式：
+        </p>
+        <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/CityEntity.kt"/>
+        <list>
+            <li>
+                属性使用 <code>val</code> 而不是 <code>var</code> 定义。这强制了不可变性，因为 <code>val</code> 属性在初始赋值后不能重新赋值。
+            </li>
+            <li>
+                在此上下文中，实体类的主要功能是从关联表查询数据，而不是修改它。因此，只能使用 DSL <a href="DSL-CRUD-operations.topic" anchor="insert"><code>.insert()</code></a> 方法执行插入，更新可以通过 DSL <a href="DSL-CRUD-operations.topic" anchor="update"><code>.update()</code></a> 或 <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-immutable-entity-class/force-update-entity.html">
+                <code>ImmutableEntityClass.forceUpdateEntity()</code></a> 方法完成。
+            </li>
+        </list>
+    </chapter>
+    <chapter id="class-method-overrides" title="类方法重写">
+        <p>
+            您可以在 <code>Entity</code> 类和 <code>EntityClass</code> 伴生对象中使用重写方法来扩展功能或管理实体行为。
+        </p>
+        <p>
+            例如，以下是如何在 <code>User</code> 实体中重写 <code>delete()</code> 方法：
+        </p>
+        <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/UserEntityWithOverride.kt"/>
+        <p>
+            在此示例中，在父类（<code>IntEntity</code>）的 <code>.delete()</code> 函数完成删除之前打印自定义消息。
+        </p>
+    </chapter>
+    <chapter title="字段转换" id="field-transformations">
+        <p>
+            由于数据库通常只存储基本类型（如整数和字符串），在 DAO 级别保持相同的简单性并不总是方便的。
+        </p>
+        <p>
+            例如，您可能需要从 <code>VARCHAR</code> 列解析 JSON，或根据数据库中的数据从缓存中检索值。
+            在这种情况下，我们建议使用列转换。
+        </p>
+        <chapter title="示例：定义无符号整数字段" id="defining-unsigned-int-field">
+            <p>
+                假设您想在实体上定义无符号整数字段，但 Exposed 尚未有此列类型。您可以使用以下实现来实现：
+            </p>
+            <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/EntityWithUInt.kt"/>
+            <p>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/transform.html">
+                    <code>.transform()</code>
+                </a>
+                函数接受两个 lambda，用于在原始列类型之间转换值。
+                在这种情况下，您确保仅将 <code>UInt</code> 实例存储在 <code>uint</code> 字段中。
+            </p>
+            <p>
+                尽管仍然可以通过 DAO 插入或更新负整数值，但这种方法确保了更清晰的业务逻辑。
+            </p>
+        </chapter>
+
+
+        <chapter title="记忆转换" id="memoized-transformations">
+            <p>
+                如果您的转换函数涉及影响性能的复杂操作，
+                您可以使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/memoized-transform.html">
+                    <code>.memoizedTransform()</code>
+                </a>
+                来缓存转换结果。
+            </p>
+
+            <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/EntityWithBase64.kt"/>
+
+            <p>
+                使用记忆转换，值只解包一次，然后为将来的读取进行缓存。
+                此缓存在实体的生命周期内保持有效。
+                如果事务的实体缓存被清除或实体在新事务中重新加载（创建没有现有值的新缓存），
+                值将被再次包装。但是，如果原始实体在事务外部保持活动状态，则缓存值会持续存在以避免重新包装。
+            </p>
+        </chapter>
+    </chapter>
+</topic>

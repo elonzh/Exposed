@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="日期和时间" id="Date-and-time-types">
+    <show-structure for="chapter" depth="2" />
+    <tldr>
+        <p>
+            <b>必需的依赖项</b>：<code>org.jetbrains.exposed:exposed-kotlin-datetime</code>、
+            <code>org.jetbrains.exposed:exposed-java-time</code> 或
+            <code>org.jetbrains.exposed:exposed-jodatime</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-supported"/>
+    </tldr>
+
+    <p>
+        Exposed 通过三个附加模块提供全面的日期和时间操作支持。每个模块基于不同的日期时间库，提供不同的功能和类型支持：
+    </p>
+    <table>
+        <tr>
+            <td>模块</td>
+            <td>基于</td>
+            <td>用途</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-kotlin-datetime/org.jetbrains.exposed.v1.datetime/index.html">
+                    <code>exposed-kotlin-datetime</code>
+                </a>
+            </td>
+            <td><a href="https://kotlinlang.org/api/kotlinx-datetime/"><code>kotlinx-datetime</code></a> 库</td>
+            <td>现代 Kotlin 优先方法，推荐用于新项目。</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-java-time/org.jetbrains.exposed.v1.javatime/index.html">
+                    <code>exposed-java-time</code>
+                </a>
+            </td>
+            <td><a href="https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html">Java 8 Time API</a></td>
+            <td>与 Java 代码集成或需要 Java 8 Time API 兼容性时的良好选择。</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-jodatime/org.jetbrains.exposed.v1.jodatime/index.html">
+                    <code>exposed-jodatime</code>
+                </a>
+            </td>
+            <td><a href="https://www.joda.org/joda-time/">Joda-Time</a> 库</td>
+            <td>遗留支持，包含用于提取时间部分（年、月、日、时、分、秒）的附加函数。新项目建议使用更新的模块。</td>
+        </tr>
+    </table>
+
+    <chapter title="基本用法" id="basic-usage">
+        <p>以下是使用日期和时间类型的示例。导入语句将根据您选择的模块而有所不同：</p>
+        <code-block lang="kotlin">
+        import org.jetbrains.exposed.v1.core.Table
+
+        // For exposed-kotlin-datetime (recommended)
+        import org.jetbrains.exposed.v1.datetime.*
+
+        // For exposed-java-time
+        import org.jetbrains.exposed.v1.javatime.*
+
+        // For exposed-jodatime
+        import org.jetbrains.exposed.v1.jodatime.*
+
+        object Events : Table() {
+            val id = integer("id").autoIncrement()
+            val name = varchar("name", 50)
+            val startDate = date("start_date")                                    // maps to LocalDate
+            val startTime = time("start_time")                                    // maps to LocalTime
+            val createdAt = datetime("created_at")                               // maps to LocalDateTime
+                .defaultExpression(CurrentDateTime)
+            val updatedAt = timestamp("updated_at")                              // maps to Instant
+            val scheduledAt = timestampWithTimeZone("scheduled_at")              // maps to OffsetDateTime
+
+            override val primaryKey = PrimaryKey(id)
+        }</code-block>
+    </chapter>
+
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            每个日期时间模块提供自己的类型集。以下是所有模块中每种支持类型的详细信息：
+        </p>
+
+        <deflist type="medium">
+            <def id="date-type">
+                <title><code>date()</code></title>
+                <p>映射到数据库 <code>DATE</code>。用于存储不带时间部分的日期值。</p>
+                <code-block lang="kotlin">
+                    val birthDate = date("birth_date")
+
+                    // Using exposed-kotlin-datetime (recommended)
+                    Events.insert {
+                        it[birthDate] = LocalDate(1990, 1, 1)
+                    }
+
+                    // Using exposed-java-time
+                    Events.insert {
+                        it[birthDate] = LocalDate.of(1990, 1, 1)
+                    }
+
+                    // Using exposed-jodatime
+                    Events.insert {
+                        it[birthDate] = org.joda.time.LocalDate(1990, 1, 1)
+                    }
+                </code-block>
+            </def>
+            <def id="datetime-type">
+                <title><code>datetime()</code></title>
+                <p>映射到数据库 <code>DATETIME</code>。用于存储日期和时间值。</p>
+                <code-block lang="kotlin">
+                    val createdAt = datetime("created_at")
+                        .defaultExpression(CurrentDateTime) // Sets current date/time when inserting new records
+
+                    // Using exposed-kotlin-datetime (recommended)
+                    Events.insert {
+                        it[createdAt] = Clock.System.now()
+                            .toLocalDateTime(TimeZone.UTC)
+                    }
+
+                    // Note: CurrentDateTime is available in all date-time modules
+
+                    // Using exposed-java-time
+                    Events.insert {
+                        it[createdAt] = LocalDateTime.now()
+                    }
+
+                    // Using exposed-jodatime
+                    Events.insert {
+                        it[createdAt] = DateTime.now()
+                    }
+                </code-block>
+                <note>
+                    <p>
+                        使用 <code>exposed-jodatime</code> 时，您可以使用以下函数提取时间部分：
+                        <code>year()</code>、<code>month()</code>、<code>day()</code>、<code>hour()</code>、
+                        <code>minute()</code> 和 <code>second()</code>。
+                    </p>
+                </note>
+            </def>
+            <def id="time-type">
+                <title><code>time()</code></title>
+                <p>映射到数据库 <code>TIME</code>。用于存储不带日期部分的时间值。</p>
+                <code-block lang="kotlin">
+                    val startTime = time("start_time")
+
+                    // Using exposed-kotlin-datetime (recommended)
+                    Events.insert {
+                        it[startTime] = LocalTime(9, 0) // 09:00
+                    }
+
+                    // Using exposed-java-time
+                    Events.insert {
+                        it[startTime] = LocalTime.of(9, 0) // 09:00
+                    }
+
+                    // Using exposed-jodatime
+                    Events.insert {
+                        it[startTime] = org.joda.time.LocalTime(9, 0) // 09:00
+                    }
+                </code-block>
+            </def>
+            <def id="timestamp-type">
+                <title><code>timestamp()</code></title>
+                <p>
+                    映射到数据库 <code>TIMESTAMP</code>。用于存储日期和时间值。<code>exposed-jodatime</code>
+                    不支持此类型。
+                </p>
+                <code-block lang="kotlin">
+                    val lastModified = timestamp("last_modified")
+
+                    // Using exposed-kotlin-datetime (recommended)
+                    Events.insert {
+                        it[lastModified] = Clock.System.now()
+                    }
+
+                    // Using exposed-java-time
+                    Events.insert {
+                        it[lastModified] = Instant.now()
+                    }
+                </code-block>
+            </def>
+            <def id="timestamp-with-timezone">
+                <title><code>timestampWithTimeZone()</code></title>
+                <p>
+                    映射到数据库 <code>TIMESTAMP WITH TIME ZONE</code>。用于存储日期和时间值，
+                    同时保留时区信息。<code>exposed-jodatime</code> 不支持此类型。
+                </p>
+                <code-block lang="kotlin">
+                    val scheduledAt = timestampWithTimeZone("scheduled_at")
+
+                    // Using exposed-kotlin-datetime (recommended)
+                    Events.insert {
+                        it[scheduledAt] = Clock.System.now().toOffsetDateTime(TimeZone.UTC)
+                    }
+
+                    // Using exposed-java-time
+                    Events.insert {
+                        it[scheduledAt] = OffsetDateTime.now(ZoneOffset.UTC)
+                    }
+                </code-block>
+                <warning>
+                    <p>
+                        PostgreSQL 和 MySQL 以 UTC 存储时间戳，因此会丢失原始时区信息。
+                        要在这些数据库中保留原始时区，您需要将时区信息存储在单独的列中。
+                    </p>
+                </warning>
+            </def>
+        </deflist>
+
+        <note>
+            <p>
+                某些类型在特定数据库方言中可能有所不同。请参阅您的数据库文档了解确切的类型映射。
+            </p>
+        </note>
+
+        <tip>
+            <p>
+                某些数据库提供特定的间隔类型（如 PostgreSQL 的 <code>INTERVAL</code>）用于存储时间间隔。
+                请参阅您的数据库文档了解支持的时间间隔类型。
+            </p>
+            <p>
+                有关处理自定义基于时间的值的更多详情，请参阅
+                <a href="Custom-data-types.topic" anchor="date-and-time-data">
+                    自定义日期和时间类型
+                </a>
+                部分。
+            </p>
+        </tip>
+    </chapter>
+</topic>

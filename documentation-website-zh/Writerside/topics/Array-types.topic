@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="数组" id="Array-types">
+    <show-structure for="chapter" depth="2"/>
+    <tldr>
+        <p>
+            <b>必需的依赖</b>: <code>org.jetbrains.exposed:exposed-core</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-limited-support"/>
+    </tldr>
+    <p>
+        Exposed 提供对数组数据类型的支持，允许您在数据库中存储和操作各种数据类型的数组。PostgreSQL 和 H2 数据库支持显式数组类型，PostgreSQL 还额外支持多维数组。
+    </p>
+
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            <code>exposed-core</code> 模块支持两种主要方式来定义数组列，使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/array.html">
+                <code>.array()</code>
+            </a>
+            函数：
+        </p>
+        <list>
+            <li>
+                <p>使用类型推断为支持的类型定义基本数组：</p>
+                <code-block lang="kotlin"
+                            src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                            include-symbol="memberIds"
+                />
+            </li>
+            <li>
+                <p>使用显式列类型定义数组，以获得更多控制或自定义类型：</p>
+                <code-block lang="kotlin"
+                            src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                            include-symbol="deadlines"
+                />
+                使用显式列类型可以防止 Exposed 无法自动确定适当映射时出现异常。
+            </li>
+        </list>
+    </chapter>
+
+    <chapter title="基本用法" id="basic-usage">
+        <p>
+            数组列以 Kotlin <code>List</code> 对象的形式存储和检索数据，为您提供了一种自然的方式来处理代码中的数组数据。
+        </p>
+        <p>您可以在表定义中定义数组列，如下所示：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-symbol="SimpleArrays, AdvancedArrays"
+        />
+        <p>以下是向数组列插入数据的示例：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-lines="63-67"
+        />
+    </chapter>
+    <chapter title="多维数组" id="multidimensional-arrays">
+        <tldr>
+            <include from="lib.topic" element-id="r2dbc-not-supported"/>
+        </tldr>
+        <p>PostgreSQL 支持多维数组，可以使用 <code>dimensions</code> 参数定义：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-symbol="MultiDimArrays"
+        />
+    </chapter>
+
+    <chapter title="数组索引" id="array-indexing">
+        <p>要访问单个元素，请使用索引运算符：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-lines="74-77"
+        />
+        <note>
+            <p>PostgreSQL 和 H2 都使用从 1 开始的索引，因此第一个元素的索引为 1。</p>
+        </note>
+    </chapter>
+
+    <chapter title="数组切片" id="array-slicing">
+        <p>
+            使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/slice.html">
+                <code>.slice()</code>
+            </a>
+            提取子数组：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-lines="84"
+        />
+        <p>在使用 PostgreSQL 时，下界和上界都是可选的。</p>
+    </chapter>
+
+    <chapter title="ANY 和 ALL 运算符" id="any-all-operators">
+        <p>将数组列与 SQL 的 <code>ANY</code> 和 <code>ALL</code> 运算符一起使用：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/ArrayExamples.kt"
+                    include-lines="91-97"
+        />
+    </chapter>
+</topic>

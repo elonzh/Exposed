@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="表类型" id="DSL-Table-Types">
+    <show-structure for="chapter,procedure" depth="2"/>
+    <snippet id="dsl-table-type">
+        <snippet id="dsl-core-table-class">
+            在 Exposed 中，<a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/index.html"><code>Table</code></a>
+            类是定义数据库表的核心抽象。
+            该类提供了定义各种<a href="Numeric-Boolean-String-Types.topic">列类型</a>、
+            <a href="Working-with-Tables.topic" anchor="constraints">约束</a>和其他表特定属性的方法。
+        </snippet>
+        <p>
+            <code>Table</code> 位于
+            <control>exposed-core</control>
+            模块的
+            <control>org.jetbrains.exposed.v1.core</control>
+            包中。
+        </p>
+    </snippet>
+    <p>
+        以下示例定义了一个包含自增整数 <code>id</code> 列以及字符串
+        <code>name</code> 和 <code>director</code> 列的表：
+    </p>
+    <code-block lang="kotlin"
+                id="StarWarsFilmsTable-dsl-code-block"
+                src="exposed-dsl/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                include-lines="3-4,17-24" />
+    <code-block lang="sql"
+                id="StarWarsFilmsTable-dsl-sql"
+                src="exposed-dsl/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                include-lines="10-14"/>
+    <p>
+        有关在 Exposed 中定义和配置表的更多信息，请参阅 <a href="Working-with-Tables.topic"/>。
+    </p>
+    <tip>
+        虽然 <code>Table</code> 是 DSL 中定义表的基础类，但为了方便起见，您也可以使用
+        DAO API 中的 <code>IdTable</code> 子类。
+        例如，要提供一个类型为 <code>Int</code> 的自增 <code>id</code> 列，您可以使用
+        <code>IntIdTable</code> 子类型：
+    <code-block lang="kotlin"
+                src="exposed-dao/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                include-symbol="StarWarsFilmsTable"/>
+        <p>
+            需要注意的是，此情况下 <code>id</code> 列的类型为
+            <code>Column&lt;EntityID&lt;Int>></code>。
+            <code>EntityID</code> 包装器确保 <code>id</code> 值在
+            DSL 和 DAO API 之间保持一致处理。
+        </p>
+        要访问 <code>id</code> 列的值，您
+        需要使用 <code>.value</code> 属性：
+        <code-block lang="kotlin"
+                    src="exposed-dao/src/main/kotlin/org/example/examples/ReadExamples.kt"
+                    include-symbol="movieId"/>
+        <p>
+            有关 <code>IdTable</code> 的更多信息，请参阅 <a href="DAO-Table-Types.topic">DAO 文档</a>。
+        </p>
+    </tip>
+    <seealso style="cards">
+        <category ref="related">
+            <a href="Working-with-Tables.topic"/>
+        </category>
+    </seealso>
+</topic>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="使用 Schema" id="Working-with-Schema">
+    <p>
+        数据库 schema 定义了关系数据库中数据的组织方式。使用 Exposed，你可以创建和删除新的或现有的 schema。
+    </p>
+    <chapter title="定义 schema" id="define-a-sequence">
+        <p>
+            要在 Exposed 中定义 schema，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-schema/index.html">
+                <code>Schema</code>
+            </a>
+            类：
+        </p>
+        <code-block lang="Kotlin">
+            val schema = Schema("my_schema") // my_schema is the schema name.
+        </code-block>
+        <p>此外，你可以通过传递 <code>authorization</code> 参数来指定 schema 所有者（某些数据库需要显式指定所有者）：</p>
+
+        <code-block lang="Kotlin">
+            val schema = Schema(&quot;my_schema&quot;, authorization = &quot;owner&quot;)
+        </code-block>
+    </chapter>
+    <chapter title="创建新 schema" id="create-schema">
+        <p>
+            要创建新 schema，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/create-schema.html">
+                <code>.createSchema()</code>
+            </a>
+            方法，该方法由 <code>SchemaUtils</code> 提供：
+        </p>
+        <code-block lang="kotlin">
+            SchemaUtils.createSchema(schema)
+        </code-block>
+    </chapter>
+    <chapter title="设置默认 schema" id="default-schema">
+        <p>如果你有多个 schema，并且想要设置一个默认 schema，可以使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/set-schema.html">
+                <code>.setSchema()</code>
+            </a>
+            方法，该方法来自 <code>SchemaUtils</code>：
+        </p>
+        <code-block lang="Kotlin">
+            SchemaUtils.setSchema(schema)
+        </code-block>
+    </chapter>
+    <chapter title="删除 schema" id="drop-schema">
+        <p>
+            要删除 schema，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/drop-schema.html">
+                <code>.dropSchema()</code>
+            </a>
+            方法，该方法由 <code>SchemaUtils</code> 提供：
+        </p>
+        <code-block lang="Kotlin">
+            SchemaUtils.dropSchema(schema)
+        </code-block>
+    </chapter>
+</topic>

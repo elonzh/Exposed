@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="表类型" id="DAO-Table-Types" help-id="DAO-Table-types">
+    <include from="DSL-Table-Types.topic" element-id="dsl-core-table-class"/>
+    <chapter title="自增 ID 列表" id="defining-tables">
+        <snippet id="dao-table-types">
+            <p>
+                除了核心 <code>Table</code> 类之外，Exposed 通过 DAO API 提供了基础
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-id-table/index.html">
+                    <code>IdTable</code>
+                </a>
+                类及其子类。
+            </p>
+            <p>
+                <code>IdTable</code> 类扩展了 <code>Table</code>，旨在简化使用标准 <code>id</code> 列作为主键的表的定义。
+                这些表可以在不显式包含 <code>id</code> 列的情况下声明，因为创建新表行时会自动生成适当类型的 ID。
+            </p>
+            <p>
+                <code>IdTable</code> 及其子类位于
+                <control>exposed-core</control>
+                模块的
+                <control>org.jetbrains.exposed.v1.core.dao.id</control>
+                包中。
+            </p>
+        </snippet>
+        <deflist type="medium">
+            <def id="IntIdTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-int-id-table/index.html"><code>IntIdTable</code></a></title>
+                <code>Int</code> ID 列</def>
+            <def id="LongIdTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-long-id-table/index.html"><code>LongIdTable</code></a></title>
+                <code>Long</code> ID 列
+            </def>
+            <def id="UIntIdTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-u-int-id-table/index.html"><code>UIntIdTable</code></a></title>
+                <code>UInt</code> ID 列
+            </def>
+            <def id="ULongIdTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-u-long-id-table/index.html"><code>ULongIdTable</code></a></title>
+                <code>ULong</code> ID 列
+            </def>
+            <def id="UuidTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-uuid-table/index.html"><code>UuidTable</code></a></title>
+                <code>kotlin.uuid.Uuid</code> ID 列
+            </def>
+
+            <def id="JavaUUIDTable">
+                <title><a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id.java/-u-u-i-d-table/index.html"><code>UUIDTable</code></a></title>
+                <code>java.util.UUID</code> ID 列。可从包 <code>org.jetbrains.exposed.v1.core.dao.id.java</code> 中获取。
+            </def>
+        </deflist>
+        <p>以下示例表示一个具有自定义列 <code>sequel_id</code>、<code>name</code>
+            和 <code>director</code> 的表：
+        </p>
+        <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                    include-lines="3-6,19-23" id="StarWarsFilmsTable-dao-code-block"/>
+        <p>
+            <snippet id="IntIdTable-id-generation-note">
+                <code>IntIdTable</code> 类通过链接 <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/auto-increment.html"><code>.autoIncrement()</code></a> 自动生成一个自增整数 <code>id</code> 列，
+                作为表的主键。
+            </snippet>
+            创建表时，它对应于以下 SQL 查询：
+        </p>
+        <code-block lang="sql"
+                    src="exposed-dao/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                    include-lines="12-16"
+                    id="StarWarsFilmsTable-dao-sql"/>
+        <p>
+            如果底层数据库支持序列创建，可以向任何兼容的 <code>IdTable</code> 的 <code>sequenceName</code>
+            参数传递参数。如果上面的示例切换为 <code>IntIdTable(sequenceName = "id_seq")</code>，
+            创建表时将生成以下 SQL 语句：
+        </p>
+        <code-block lang="sql">
+            CREATE SEQUENCE IF NOT EXISTS id_seq
+            START WITH 1 MINVALUE 1 MAXVALUE 9223372036854775807;
+            CREATE TABLE IF NOT EXISTS STARWARSFILMS
+            (ID INT PRIMARY KEY,
+            SEQUEL_ID INT NOT NULL,
+            "name" VARCHAR(50) NOT NULL,
+            DIRECTOR VARCHAR(50) NOT NULL);
+        </code-block>
+        <chapter title="自动生成 Uuid" id="auto-generating-uuids">
+            <p>
+                <code>UuidTable</code> 类在插入操作期间，只要未手动为列赋值，就会在客户端自动生成随机的 Kotlin <code>Uuid</code> 实例。默认情况下，此类依赖于调用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/auto-generate.html"><code>.autoGenerate()</code></a>，
+                该方法从 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/-companion/generate-v4.html"><code>Uuid.generateV4()</code></a> 返回版本 4 的 Uuid。
+            </p>
+            <p>
+                如果您希望 <code>UuidTable</code> 类使用 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/-companion/generate-v7.html"><code>Uuid.generateV7()</code></a>
+                自动生成基于时间的 Uuid，可以通过向 <code>uuidVersion</code> 构造函数参数提供参数来实现，例如
+                <code>UuidTable(uuidVersion = UuidVersion.V7)</code>。
+                这等同于直接在注册的 Uuid 列上链接 <code>.autoGenerate(UuidVersion.V7)</code>。
+            </p>
+            <p>
+                Java <code>UUIDTable</code> 类通过在插入操作前调用 <code>UUID.randomUUID()</code>
+                自动生成随机的 Java <code>UUID</code> 实例。
+            </p>
+        </chapter>
+        <p>
+            有关在 Exposed 中定义和配置表的更多信息，请参阅<a href="Working-with-Tables.topic"/>。
+        </p>
+    </chapter>
+
+    <chapter title="复合 ID 表" id="composite-id-table">
+        <p>
+            要将多个列定义为主键和 ID 的一部分，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.dao.id/-composite-id-table/index.html">
+                <code>CompositeIdTable</code>
+            </a>
+            并使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/entity-id.html">
+                <code>.entityId()</code>
+            </a>
+            标记每个复合列。
+            每个组件列都可以单独（作为任何标准列）或作为 <code>id</code> 列的一部分一起用于 CRUD 操作：
+        </p>
+        <tabs>
+            <tab id="DirectorsTable-definition" title="DirectorsTable">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/DirectorsTable.kt"/>
+            </tab>
+            <tab id="DirectorEntity-definition" title="DirectorEntity">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/DirectorEntity.kt"/>
+            </tab>
+        </tabs>
+
+        <include from="Working-with-Tables.topic" element-id="add-id-column-tip"/>
+
+        <tabs>
+            <tab id="DirectorsWithGuildRefTable-definition" title="DirectorsWithGuildRefTable">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/DirectorsWithGuildRefTable.kt"/>
+            </tab>
+            <tab id="GuildsTable-definition" title="GuildsTable">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/GuildsTable.kt"/>
+            </tab>
+        </tabs>
+    </chapter>
+
+    <chapter title="自定义列类型表" id="custom-column-type">
+        <p>
+            要将自定义列类型定义为主键和 ID，请直接使用带类型的 <code>IdTable</code> 并
+            重写 <code>id</code> 列，如下例所示：
+        </p>
+        <tabs>
+            <tab id="DirectorsCustomTable-definition" title="DirectorsCustomTable">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/tables/DirectorsCustomTable.kt"/>
+            </tab>
+            <tab id="DirectorCustomEntity-definition" title="DirectorCustomEntity">
+                <code-block lang="kotlin" src="exposed-dao/src/main/kotlin/org/example/entities/DirectorCustomEntity.kt"/>
+            </tab>
+        </tabs>
+        <p>
+            在 <code>DirectorsCustomTable</code> 的定义中，<code>id</code> 字段的类型为 <code>Column&lt;EntityID&lt;String&gt;&gt;</code>，
+            将保存长度最多 32 个字符的 <code>String</code> 值。使用
+            <code>override</code> 关键字表示此 <code>id</code> 列正在重写 <code>IdTable</code> 提供的默认
+            <code>id</code> 列。
+        </p>
+        <p>
+            定义所有列后，<code>id</code> 列再次使用 <code>override</code> 关键字显式设置为表的主键。
+        </p>
+    </chapter>
+    <seealso style="cards">
+        <category ref="related">
+            <a href="Working-with-Tables.topic"/>
+        </category>
+    </seealso>
+</topic>

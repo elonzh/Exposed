@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic SYSTEM "https://resources.jetbrains.com/writerside/1.0/html-entities.dtd">
+
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="Exposed 文档"
+       id="Home">
+
+    <section-starting-page>
+        <title>Exposed 文档</title>
+        <description>
+            Exposed 是一个 Kotlin SQL 数据库库，提供两种风格：轻量级 ORM（使用 DAO）和类型安全 SQL（使用 DSL）。
+        </description>
+
+        <spotlight>
+            <a href="Get-Started-with-Exposed.topic" type="learn"
+               summary="学习如何使用 Exposed DSL API 在 Kotlin 中创建和查询表">
+                快速开始 Exposed
+            </a>
+            <a href="https://jetbrains.github.io/Exposed/api/index.html" type="server"
+               summary="外部 API 文档">
+                API 参考
+            </a>
+        </spotlight>
+
+        <primary>
+            <title>了解更多</title>
+            <a href="Adding-dependencies.md"
+               summary="学习如何使用 Gradle 或 Maven 构建系统在现有项目中配置 Exposed">
+                添加依赖
+            </a>
+            <a href="Working-with-Tables.topic" summary="开始创建你的第一个表并熟悉列类型"/>
+            <a href="DSL-CRUD-operations.topic" summary="学习如何使用 Exposed 查询 DSL 编写数据库查询">
+                查询数据库
+            </a>
+            <a href="DAO-CRUD-Operations.topic"
+               summary="学习如何使用实体映射执行基本的 CRUD（创建、读取、更新、删除）操作">
+                ORM 实体入门
+            </a>
+        </primary>
+        <secondary>
+            <title>版本发布与贡献</title>
+            <a href="Contributing.md" summary="学习如何为 Exposed 做贡献">
+                为 Exposed 做贡献
+            </a>
+            <a href="Migration-Guide-1-0-0.md" summary="查看如何更新到最新 Exposed 版本">
+                迁移指南
+            </a>
+        </secondary>
+    </section-starting-page>
+</topic>

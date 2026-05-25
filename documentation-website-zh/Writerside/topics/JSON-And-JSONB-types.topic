@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="JSON 和 JSONB" id="JSON-And-JSONB-types">
+    <show-structure for="chapter" depth="2" />
+    <tldr>
+        <p>
+            <b>必需依赖</b>: <code>org.jetbrains.exposed:exposed-json</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-supported"/>
+    </tldr>
+    <p>
+        Exposed 与你选择的 JSON 序列化库协同工作，允许通过
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/json.html">
+            <code>json()</code>
+        </a>
+        和
+        <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/jsonb.html">
+            <code>jsonb()</code>
+        </a>
+        函数定义接受通用序列化器和反序列化器参数的列。
+    </p>
+    <p>
+        由于数据库以文本或二进制格式存储 JSON 值，Exposed 提供了两种类型来解释任何可能存在的差异。
+    </p>
+    <chapter title="基本用法" id="basic-usage">
+        <p>
+            以下示例利用
+            <a href="https://github.com/Kotlin/kotlinx.serialization">
+                <code>kotlinx.serialization</code>
+            </a>
+            来支持
+            <code>@Serializable</code> 类。它使用了依赖于该库的 <code>KSerializer</code> 接口的 <code>json()</code> 简化形式：</p>
+
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                    include-lines="5-6,7,17,18-19,29-38" />
+        <p>
+            以下是使用 <a href="https://github.com/FasterXML/jackson">Jackson</a> 配合 <code>jackson-module-kotlin</code> 依赖和 <code>json()</code> 完整形式定义相同 <code>Project</code> 和 <code>TeamsTable</code> 的方式：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                    include-lines="3-4,18-19,29-31,41-48"
+        />
+    </chapter>
+    <chapter title="支持的类型" id="supported-types">
+        <p>
+            <code>exposed-json</code> 扩展提供以下附加类型：
+        </p>
+        <deflist type="medium">
+            <def id="json-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/json.html">
+                        <code>json()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>JSON</code>。用于以文本格式存储 JSON 数据。</p>
+                <p>数据库特定映射：</p>
+                <list>
+                    <li>SQLite: 映射到 <code>TEXT</code></li>
+                    <li>SQLServer: 映射到 <code>NVARCHAR(MAX)</code></li>
+                    <li>Oracle: 映射到 <code>VARCHAR2(4000)</code></li>
+                </list>
+            </def>
+            <def id="jsonb-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/jsonb.html">
+                        <code>jsonb()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>JSONB</code>。用于以二进制格式存储 JSON 数据。</p>
+                <p>数据库特定映射：</p>
+                <list>
+                    <li>MySQL 和 H2: 映射到 <code>JSON</code></li>
+                    <li>SQLite: 从版本 3.45.0.0+ 起映射到 <code>BLOB</code>；否则不支持</li>
+                    <li>Oracle: 不支持</li>
+                </list>
+            </def>
+        </deflist>
+        <chapter title="SQLite 和 JSONB" id="sqlite">
+            <p>
+                SQLite 从版本 3.45.0.0 开始支持将 JSON 字符串存储为 JSONB 二进制格式。为此，设置到 <code>.jsonb()</code> 列的任何 JSON 值都将自动被 SQL 函数 <code>JSONB()</code> 包装。这适用于 DDL 默认子句中设置的值：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="30-31,161,170-174"
+            />
+            <code-block lang="sql"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="165-168"
+            />
+            <p>
+                以及 DML 操作中设置的值：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="136-138"
+            />
+            <code-block lang="sql"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="132-133"
+            />
+            <p>
+                这意味着尝试直接按存储在列中的值读取将由于不可读的 JSONB 二进制格式而引发解码异常。SQLite 提供了 SQL 函数 <code>JSON()</code>，当需要以文本格式读取存储的值时使用，Exposed 在列包含在 <code>SELECT</code> 子句中时默认使用它：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="147-149"
+            />
+            <code-block lang="sql"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="144"
+            />
+            <p>
+                如果不希望在查询中使用此自动函数包装，可以通过将参数 <code>castToJsonFormat</code> 设置为 <code>false</code> 来关闭它。如果检测到其他数据库，则忽略此参数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="176-178"
+            />
+            <p>
+                <code>JSON()</code> 函数也可以通过使用 <a href="#json-functions"><code>.castToJson()</code></a> 应用于单个 JSONB 列。
+            </p>
+        </chapter>
+    </chapter>
+    <chapter title="JSON 函数" id="json-functions">
+        <chapter title="提取数据">
+            <p>
+                你可以使用 JSON 路径字符串将值提取为 JSON 或特定字段/键的标量值。为此，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/extract.html">
+                    <code>.extract()</code>
+                </a>
+                函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="79-81"
+            />
+            <p>
+                支持路径上下文根 <code>$</code> 的数据库默认会将此值附加到生成的 SQL 路径表达式中，因此无需在提供的参数字符串中包含它。在上面的示例中，如果使用 MySQL，提供的路径参数应分别为 <code>.name</code> 和 <code>.language</code>。
+            </p>
+        </chapter>
+        <chapter title="检查数据是否存在">
+            <p>
+                要检查 JSON 表达式中是否存在数据，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/exists.html">
+                    <code>.exists()</code>
+                </a>
+                函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="85-86"
+            />
+            <p>
+                根据数据库的不同，还可以提供过滤路径以及可选参数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="93-95"
+            />
+        </chapter>
+        <chapter title="检查 JSON 是否包含表达式">
+            <p>
+                要检查 JSON 中是否包含表达式，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/contains.html">
+                    <code>.contains()</code>
+                </a>
+                函数：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="100-101"
+            />
+            <p>
+                根据数据库的不同，你还可以提供可选路径：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="108-109"
+            />
+        </chapter>
+        <chapter title="将数据转换为 JSON 类型">
+            <p>
+                你可以使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/cast-to-json.html">
+                    <code>.castToJson()</code>
+                </a>
+                函数将其他支持的数据类型（如文本或 JSONB）转换为 JSON 数据类型：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                        include-lines="153-158"
+            />
+            <p>
+                如果数据库支持，此函数可用于将存储在文本列中的有效 JSON 字符串转换为你选择的可序列化类。
+            </p>
+        </chapter>
+    </chapter>
+    <chapter title="JSON 数组" id="json-arrays">
+        <p>
+            JSON 列也接受 JSON 数组作为输入值，允许直接在数据库中存储和操作结构化数据。
+        </p>
+        <p>
+            要定义包含数组的 JSON 列，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/json.html">
+                <code>json()</code>
+            </a>
+            函数并指定适当的类型。以下示例使用可序列化数据类 <code>Project</code> 定义了原始值和对象数组的 JSON 列：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                    include-symbol="Project, TeamProjectsTable"
+        />
+        <p>
+            要向 JSON 数组列插入数据，请使用标准 Kotlin 集合：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                    include-lines="120-126"
+        />
+        <p>
+            这将生成以下 SQL 查询：
+        </p>
+        <code-block lang="sql"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt"
+                    include-lines="116-117"
+        />
+    </chapter>
+</topic>

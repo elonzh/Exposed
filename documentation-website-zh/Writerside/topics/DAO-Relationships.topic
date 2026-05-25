@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="关系" id="DAO-Relationships">
+    <show-structure for="chapter" depth="2" />
+    <tldr>
+        <p>
+            <b>必需的依赖</b>: <code>org.jetbrains.exposed:exposed-dao</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-not-supported"/>
+        <p><b>代码示例</b>:
+            <a href="https://github.com/JetBrains/Exposed/tree/main/documentation-website/Writerside/snippets/exposed-dao-relationships/">
+                exposed-dao-relationships
+            </a>
+        </p>
+    </tldr>
+
+    <p>
+        关系定义了实体在数据库 schema 中如何相互关联，并提供了查询和操作这些关联的机制。实体之间有四种引用方式：
+    </p>
+    <list>
+        <li><a anchor="many-to-one-reference">多对一引用</a></li>
+        <li><a anchor="optional-reference">可选引用</a></li>
+        <li><a anchor="many-to-many-reference">多对多引用</a></li>
+        <li><a anchor="parent-child-reference">父子引用</a></li>
+    </list>
+    <chapter title="多对一引用" id="many-to-one-reference">
+        <p>
+            多对一引用是两个数据库表之间的关系，其中一个表（"子"表）中的多行可以引用另一个表（"父"表）中的单行。
+        </p>
+        <p>
+            考虑以下 <code>UsersTable</code> 及其实体：
+        </p>
+        <tabs>
+            <tab id="users-table" title="UsersTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/tables/UsersTable.kt"
+                            include-symbol="UsersTable"
+                />
+            </tab>
+            <tab id="user-entity" title="UserEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserEntity.kt"
+                            include-lines="17-20,22"
+                />
+            </tab>
+        </tabs>
+        <p>
+            假设您想添加另一个表 <code>UserRatingsTable</code> 来存储用户对特定电影的评分。每个评分都与一个用户关联，但一个用户可以与多个评分关联。这是一个多对一关系。
+        </p>
+        <p>
+            您可以通过在子表（<code>UserRatingsTable</code>）中使用引用列来实现此关系，该引用列链接到父表（<code>UsersTable</code>）。要创建引用列，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/reference.html">
+                <code>reference()</code>
+            </a>
+            函数：
+        </p>
+        <tabs>
+            <tab id="user-ratings-table" title="UserRatingsTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/tables/UserRatingsTable.kt"
+                            include-symbol="UserRatingsTable"
+                />
+            </tab>
+            <tab id="user-ratings-entity" title="UserRatingEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserRatingEntity.kt"
+                            include-symbol="UserRatingEntity"
+                />
+            </tab>
+        </tabs>
+
+        <chapter title="访问数据" id="accessing-data">
+            <p>
+                您可以像获取任何其他字段一样检索 <code>UserRatingEntity</code> 对象的电影：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao-relationships/src/main/kotlin/org/example/examples/OneToManyExamples.kt"
+                        include-symbol="film"
+            />
+        </chapter>
+        <chapter title="反向访问" id="reverse-access">
+            <p>
+                如果您想获取电影的所有评分，可以使用实体类的 <code>.find()</code> 函数。但是，更简单的方法是在表示电影的 <code>StarWarsFilmEntity</code> 类中添加
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/referrers-on.html">
+                    <code>referrersOn</code>
+                </a>
+                字段：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao-relationships/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                        include-lines="19-25,27"
+            />
+            <p>
+                然后您可以在实体对象上访问此字段：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao-relationships/src/main/kotlin/org/example/examples/OneToManyExamples.kt"
+                        include-symbol="filmRatings"
+            />
+        </chapter>
+        <chapter title="反向引用" id="back-reference">
+            <p>
+                如果每个用户只对一部电影评分，您可以在实体类中定义
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/back-referenced-on.html">
+                    <code>backReferencedOn</code>
+                </a>
+                字段来访问 <code>UserRatingsTable</code> 数据：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserEntity.kt"
+                        include-symbol="UserWithSingleRatingEntity"
+            />
+            <p>然后您可以在 <code>UserWithSingleRatingEntity</code> 对象上访问此字段：</p>
+            <code-block lang="kotlin">
+                user1.rating // returns a UserRating object
+            </code-block>
+        </chapter>
+    </chapter>
+    <chapter title="可选引用" id="optional-reference">
+        <p>在 Exposed 中，您还可以添加可选引用。</p>
+        <p>
+            例如，如果您想在表中包含匿名用户评分，可以通过在表中使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/opt-reference.html">
+                <code>optReference()</code>
+            </a>
+            将引用字段设置为可选，并在实体定义中使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/optional-referenced-on.html">
+                <code>optionalReferencedOn</code>
+            </a>
+            ：
+        </p>
+        <tabs>
+            <tab id="user-ratings-table-with-optional-reference" title="UserRatingsWithOptionalUserTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/tables/UserRatingsTable.kt"
+                            include-symbol="UserRatingsWithOptionalUserTable"
+                />
+            </tab>
+            <tab id="user-ratings-entity-with-optional-reference" title="UserRatingWithOptionalUserEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserRatingEntity.kt"
+                            include-symbol="UserRatingWithOptionalUserEntity"
+                />
+            </tab>
+        </tabs>
+    </chapter>
+    <chapter title="有序引用" id="ordered-reference">
+        <p>
+            您可以使用 <code>orderBy</code> 定义引用实体的显示顺序：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserEntity.kt"
+                    include-symbol="UserEntity"
+        />
+        <p>
+            在更复杂的场景中，您可以指定多个列以及每个列的相应排序顺序：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserEntity.kt"
+                    include-lines="23-27,37-41"
+        />
+        <p>不使用 <a href="https://kotlinlang.org/docs/functions.html#infix-notation">中缀表示法</a>，
+            <code>orderBy</code> 方法在 <code>referrersOn</code> 之后链式调用：</p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/UserEntity.kt"
+                    include-lines="23-27,32-35,41"
+        />
+    </chapter>
+    <chapter title="多对多引用" id="many-to-many-reference">
+        <p>
+            多对多引用是两个数据库表之间的关系，其中一个表中的多条记录与另一个表中的多条记录相关。这种类型的关系通过使用中间表来链接两个表来建模。
+        </p>
+        <p>
+            考虑以下表 <code>ActorsTable</code> 及其实体：
+        </p>
+        <tabs>
+            <tab id="actors-table" title="ActorsTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/tables/ActorsTable.kt"
+                            include-symbol="ActorsTable"
+                />
+            </tab>
+            <tab id="actor-entity" title="ActorEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/entities/ActorEntity.kt"
+                            include-symbol="ActorEntity"
+                />
+            </tab>
+        </tabs>
+
+        <p>
+            假设您现在想扩展此表以包含对 <code>StarWarsFilmEntity</code> 类的引用。为此，您可以创建一个额外的中间表来存储引用：
+        </p>
+
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/tables/ActorsTable.kt"
+                    include-symbol="StarWarsFilmActorsTable"
+        />
+        <p>
+            使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity/via.html">
+                <code>via</code>
+            </a>
+            函数在 <code>StarWarsFilmEntity</code> 中添加对 <code>ActorEntity</code> 的引用：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                    include-lines="26"
+        />
+        <p>最终的 <code>StarWarsFilmEntity</code> 将如下所示：</p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                    include-symbol="StarWarsFilmEntity"
+        />
+    </chapter>
+    <chapter title="父子引用" id="parent-child-reference">
+
+        <p>
+            父子引用与多对多关系非常相似，但中间表包含对同一表的两个引用。
+        </p>
+        <p>
+            父子关系可以表示层次数据，例如一系列电影及其导演。
+            例如，您可能想跟踪导演如何监督多部星球大战电影，包括续集或衍生作品。为此，您需要创建一个自引用中间表来定义父电影（原始）与其子电影（续集或衍生作品）之间的关系：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                    include-symbol="StarWarsFilmRelationsTable"
+        />
+        <p>
+            在此示例中，<code>parentFilm</code> 代表原始电影，而 <code>childFilm</code> 代表续集、前传或衍生作品。如您所见，<code>StarWarsFilmRelationsTable</code> 的列仅指向 <code>StarWarsFilmsWithDirectorTable</code>。
+        </p>
+        <p>
+            然后您需要更新实体类以使用 <code>via</code> 函数包含父子电影的关系：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                    include-symbol="StarWarsFilmWithParentAndChildEntity"
+        />
+        <p>
+            以下是为 <code>StarWarsFilmsTable</code> 创建和查询父子层次结构的方法：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/examples/ParentChildExamples.kt"
+                    include-lines="16-40"
+        />
+    </chapter>
+    <chapter title="复合主键引用" id="composite-primary-key-reference">
+        <p>
+            在某些数据库 schema 中，使用复合主键通过组合多列来唯一标识行。以下是如何引用复合 ID 表的方法。
+        </p>
+        <p>
+            假设您有以下 <code>CompositeIdTable</code> 及其实体：
+        </p>
+        <tabs>
+            <tab id="directors-table" title="DirectorsCompositeIdTable">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/tables/DirectorsTable.kt"
+                            include-symbol="DirectorsCompositeIdTable"
+                />
+            </tab>
+            <tab id="director-entity" title="DirectorCompositeIDEntity">
+                <code-block lang="kotlin"
+                            src="exposed-dao-relationships/src/main/kotlin/org/example/entities/DirectorEntity.kt"
+                            include-lines="26-29,31"
+                />
+            </tab>
+        </tabs>
+        <p>
+            我们可以重构 <code>StarWarsFilmsTable</code> 表以引用此表，方法是添加列来保存相应的主键值并创建表级外键约束：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                    include-symbol="StarWarsFilmsWithCompositeRefTable"
+        />
+        <p>
+            然后，使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/-entity-class/referenced-on.html">
+                <code>referencedOn</code>
+            </a>
+            函数将字段添加到实体：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/StarWarsFilmEntity.kt"
+                    include-symbol="StarWarsFilmWithCompositeRefEntity"
+        />
+        <tip>
+            有关创建表外键约束的更多信息，请参见
+            <a href="Working-with-Tables.topic#foreign-key">
+                外键约束
+            </a>
+            部分。
+        </tip>
+        <p>
+            现在您可以像获取任何其他字段一样获取 <code>StarWarsFilm</code> 对象 <code>movie</code> 的导演：
+        </p>
+        <code-block lang="kotlin">
+            movie.director // returns a Director object
+        </code-block>
+        <p>
+            如果您想获取导演制作的所有电影，可以在 <code>DirectorCompositeIDEntity</code> 类中添加 <code>referrersOn</code> 字段：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/entities/DirectorEntity.kt"
+                    include-symbol="DirectorCompositeIDEntity"
+        />
+
+        <p>
+            然后您可以在 <code>DirectorCompositeIDEntity</code> 对象 <code>director</code> 上访问此字段：
+        </p>
+
+        <code-block lang="kotlin">
+            director.films // returns all StarWarsFilm objects that reference this director
+        </code-block>
+        <p>也支持使用其他前面提到的 <a href="https://kotlinlang.org/docs/functions.html#infix-notation">中缀函数</a>，
+            如 <code>optionalReferencedOn</code>、<code>backReferencedOn</code> 和 <code>optionalReferrersOn</code>，来引用或被引用 <code>CompositeEntity</code> 对象，
+            方法是使用接受 <code>IdTable</code> 作为参数的相应重载。
+            这些重载将自动解析与复合主键关联的外键约束。</p>
+    </chapter>
+    <chapter title="预先加载" id="eager-loading">
+        <p>
+            Exposed 中的引用是延迟加载的，这意味着在首次使用引用时才会执行获取数据的查询。在您知道将提前需要引用的情况下，Exposed 可以在父查询时预先加载它们。这可以防止经典的"N+1"问题，因为引用可以聚合并在单个查询中加载。
+        </p>
+        <p>
+            要预先加载引用，请使用 <code>.load()</code> 函数并将 DAO 的引用作为 <code>KProperty</code> 传递：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/examples/EagerLoadingExamples.kt"
+                    include-lines="11"
+        />
+        <p>
+            这也适用于引用的引用。例如，如果 <code>UserRatingTable</code> 有 <code>film</code> 引用，您可以执行以下操作：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dao-relationships/src/main/kotlin/org/example/examples/EagerLoadingExamples.kt"
+                    include-lines="14"
+        />
+        <note>
+            预先加载的引用存储在事务缓存中。
+            这意味着它们在其他事务中不可用，
+            因此必须在同一事务中加载和引用。
+            在 <code>DatabaseConfig</code> 中启用 <code>keepLoadedReferencesOutOfTransaction</code>
+            将允许在事务块之外获取引用值。
+        </note>
+        <chapter title="加载集合" id="eager-loading-collections">
+            <p>
+                要预先加载 DAO 的 <code>Collections</code>（如 <code>List</code>
+                和 <code>SizedIterable</code>）上的引用，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-dao/org.jetbrains.exposed.v1.dao/with.html">
+                    <code>.with()</code>
+                </a>
+                函数并将每个引用作为 <code>KProperty</code> 传递：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dao-relationships/src/main/kotlin/org/example/examples/EagerLoadingExamples.kt"
+                        include-lines="17"
+            />
+            <p>
+                <code>.with()</code> 预先加载 <code>.all()</code> 返回的 <code>SizedIterable</code> 中所有 <code>Entity</code> 实例的引用并返回此集合。
+            </p>
+            <note>
+                <code>SizedIterable</code> 需要事务来执行其任何方法，因此加载的集合不能直接在 <code>transaction</code> 块之外使用，除非先转换为标准集合，例如调用 <code>.toList()</code>。
+            </note>
+        </chapter>
+        <chapter title="加载文本字段" id="eager-loading-text-fields">
+            <p>
+                某些数据库驱动程序由于性能和内存原因不会立即加载文本内容。
+                这意味着您只能在打开的事务中获取列值。
+            </p>
+            <p>
+                要使内容在事务之外可用，请在字段定义中使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-text-column-type/eager-loading.html">
+                    <code>eagerLoading</code>
+                </a>
+                参数：
+            </p>
+            <code-block lang="kotlin">
+                object StarWarsFilmsTable : Table() {
+                    //...
+                    val description = text("name", eagerLoading=true)
+                }
+            </code-block>
+        </chapter>
+    </chapter>
+</topic>

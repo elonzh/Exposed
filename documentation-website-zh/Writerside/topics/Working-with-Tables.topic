@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       id="Working-with-Tables" title="使用表" help-id="Table-Definition">
+
+    <show-structure for="chapter,procedure" depth="2"/>
+
+    <p>在本主题中，我们将介绍如何定义、配置和创建表。所有示例使用 H2 数据库生成 SQL。</p>
+    <chapter title="表类型" id="table-types">
+        <chapter title="Table" id="table-class">
+            <include from="DSL-Table-Types.topic" element-id="dsl-table-type"/>
+        </chapter>
+        <chapter title="IdTable" id="id-table-type">
+            <include from="DAO-Table-Types.topic" element-id="dao-table-types"/>
+            有关 <code>IdTable</code> 类型的更多信息，请参见 <a href="DAO-Table-Types.topic">DAO
+            表类型</a>。
+        </chapter>
+    </chapter>
+    <chapter title="定义表" id="defining-tables">
+        <p>
+            数据库表由继承自 <code>Table</code> 类的对象表示。
+        </p>
+        <code-block lang="kotlin">
+            object StarWarsFilms : Table() {}
+        </code-block>
+        <p>
+            Exposed 支持多种列类型，包括
+            <a href="Numeric-Boolean-String-Types.topic">
+                基本类型
+            </a>
+            、
+            <a href="Date-and-time-types.topic">日期和时间</a>
+            、
+            <a href="Array-types.topic">数组</a>
+            、
+            <a href="Binary-types.topic">二进制数据</a>
+            等。每列通过在 <code>Table</code> 对象上调用相应的方法来定义。
+        </p>
+        <p>以下示例定义了一个表，其中包含一个自增整数 <code>id</code> 列和自定义列
+            <code>sequel_id</code>、<code>name</code> 和 <code>director</code>：
+        </p>
+        <tabs group="type">
+            <tab title="Table" id="dsl-table-def" group-key="Table">
+                <include from="DSL-Table-Types.topic" element-id="StarWarsFilmsTable-dsl-code-block"/>
+            </tab>
+            <tab title="IntIdTable" id="dao-table-def" group-key="IntIdTable">
+                <include from="DAO-Table-Types.topic" element-id="StarWarsFilmsTable-dao-code-block"/>
+            </tab>
+        </tabs>
+        <p>
+            <include from="DAO-Table-Types.topic" element-id="IntIdTable-id-generation-note"/>
+            因此，无需在 <code>StarWarsFilmsTable</code> 对象中显式定义 <code>id</code> 列。
+        </p>
+        <p>
+            使用上述定义创建表将生成以下等效 SQL：
+        </p>
+        <tabs group="type">
+            <tab title="Table" id="dsl-create-table-sql" group-key="Table">
+                <include from="DSL-Table-Types.topic" element-id="StarWarsFilmsTable-dsl-sql" />
+            </tab>
+            <tab title="IntIdTable" id="dao-create-table-sql" group-key="IntIdTable">
+                <include from="DAO-Table-Types.topic" element-id="StarWarsFilmsTable-dao-sql" />
+            </tab>
+        </tabs>
+        <chapter title="配置自定义表名" id="name-from-object">
+            <p>
+                默认情况下，Exposed 从完整的类名生成表名。
+            </p>
+            <p>
+                如果对象名称包含 'Table' 后缀，Exposed 将从生成的表名中省略该后缀：
+            </p>
+            <code-block lang="kotlin"
+                        include-symbol="StarWarsFilmsTable"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt" />
+            <code-block lang="sql"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/StarWarsFilmsTable.kt"
+                        include-lines="10-14"/>
+            <p>
+                要为表配置自定义名称（将在实际 SQL 查询中使用），请将其传递给 <code>Table</code> 构造函数的 <code>name</code> 参数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/TableWithCustomName.kt"
+                        include-symbol="CustomStarWarsFilmsTable" />
+            <code-block lang="sql"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/TableWithCustomName.kt"
+                        include-lines="6-10" />
+            <p>某些数据库（如 H2）会将未加引号的标识符转换为大写。要保持表名的大小写敏感性，请手动引用提供的参数：</p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/TableWithCustomName.kt"
+                        include-symbol="StarWarsFilms" />
+            <code-block lang="sql"
+                        src="exposed-dsl/src/main/kotlin/org/example/tables/TableWithCustomName.kt"
+                        include-lines="21-25" />
+            <p>根据你使用的 DBMS，实际 SQL 查询中的列类型可能会有所不同。</p>
+        </chapter>
+        <chapter title="表选项" id="table-options">
+            <p>
+                Exposed 允许你使用 <code>options</code> 和
+                <code>storageParameters</code> 属性指定数据库特定的表选项。这些选项将附加到生成的 <code>CREATE TABLE</code>
+                语句中。
+            </p>
+            <chapter title="表修饰符" id="table-modifiers">
+                <p>
+                    <code>options</code> 属性接受一个 <code>TableOption</code> 对象列表，这些对象将附加在表定义之后。这通常用于 MySQL/MariaDB 存储引擎和字符集配置：
+                </p>
+                <code-block lang="kotlin">
+                    object Users : Table("users") {
+                        val id = integer("id")
+                        val name = varchar("name", 50)
+                        override val primaryKey = PrimaryKey(id)
+                        override val options = listOf(
+                            EngineOption(TableEngine.INNODB),
+                            CharsetOption("utf8mb4")
+                        )
+                    }
+                </code-block>
+                <p>这将生成以下 SQL：</p>
+                <code-block lang="sql">
+                    CREATE TABLE users (
+                        id INT NOT NULL,
+                        name VARCHAR(50) NOT NULL,
+                        PRIMARY KEY (id)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                </code-block>
+                <p>
+                    对于内置修饰符未涵盖的自定义数据库特定选项，请使用 <code>RawTableOption</code>：
+                </p>
+                <code-block lang="kotlin">
+                    override val options = listOf(RawTableOption("ROW_FORMAT=COMPRESSED"))
+                </code-block>
+                <note>
+                    <p>
+                        表选项是数据库特定的。有关可用选项，请参阅
+                        <a href="https://dev.mysql.com/doc/refman/8.0/en/create-table.html">MySQL</a> 或
+                        <a href="https://mariadb.com/kb/en/create-table/">MariaDB</a> 文档。
+                    </p>
+                </note>
+            </chapter>
+            <chapter title="存储参数" id="storage-parameters">
+                <p>
+                    <code>storageParameters</code> 属性接受一个 <code>TableStorageParameter</code> 对象列表，这些对象将包含在 <code>WITH</code> 子句中。PostgreSQL、SQL Server 和其他数据库使用此选项来设置存储特定选项：
+                </p>
+                <code-block lang="kotlin">
+                    object LargeDataTable : Table("large_data") {
+                        val id = integer("id")
+                        val data = text("data")
+                        override val primaryKey = PrimaryKey(id)
+                        override val storageParameters = listOf(
+                            FillFactorParameter(70),
+                            AutovacuumEnabledParameter(false)
+                        )
+                    }
+                </code-block>
+                <p>这将为 PostgreSQL 生成以下 SQL：</p>
+                <code-block lang="sql">
+                    CREATE TABLE large_data (
+                        id INT NOT NULL,
+                        data TEXT NOT NULL,
+                        PRIMARY KEY (id)
+                    ) WITH (fillfactor=70, autovacuum_enabled=false)
+                </code-block>
+                <p>
+                    对于内置类型未涵盖的自定义存储参数，请使用 <code>RawStorageParameter</code>：
+                </p>
+                <code-block lang="kotlin">
+                    override val storageParameters = listOf(RawStorageParameter("parallel_workers=4"))
+                </code-block>
+                <note>
+                    <p>
+                        存储参数是数据库特定的。有关可用参数，请参阅
+                        <a href="https://www.postgresql.org/docs/current/sql-createtable.html">PostgreSQL</a> 或
+                        <a href="https://learn.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql">SQL Server</a>
+                        文档。
+                    </p>
+                </note>
+                <tip>
+                    <p>
+                        如果你的数据库支持，可以同时使用 <code>options</code> 和 <code>storageParameters</code>，尽管这在实践中并不常见。
+                    </p>
+                </tip>
+            </chapter>
+            <chapter title="数据库特定文档" id="table-options-references">
+                <p>
+                    有关你的数据库可用表选项和存储参数的完整信息，请参阅官方文档：
+                </p>
+                <list>
+                    <li>
+                        <a href="https://dev.mysql.com/doc/refman/8.0/en/create-table.html">MySQL CREATE TABLE 语法</a>
+                        （参见 table_options 部分）
+                    </li>
+                    <li>
+                        <a href="https://mariadb.com/docs/server/server-usage/tables/create-table#table-options">MariaDB CREATE TABLE 语法</a>
+                        （参见 table_options 部分）
+                    </li>
+                    <li>
+                        <a href="https://www.postgresql.org/docs/current/sql-createtable.html">PostgreSQL CREATE TABLE 语法</a>
+                        （参见存储参数的 WITH 子句）
+                    </li>
+                    <li>
+                        <a href="https://learn.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql">SQL Server CREATE TABLE 语法</a>
+                    </li>
+                </list>
+            </chapter>
+        </chapter>
+    </chapter>
+
+    <chapter title="约束" id="constraints">
+        <chapter title="可空" id="nullable">
+            <p>
+                <code>NOT NULL</code> SQL 约束限制列接受 <code>null</code> 值。默认情况下，Exposed 将此约束应用于所有列。要允许列可为空，请将
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/nullable.html">
+                    <code>.nullable()</code>
+                </a>
+                方法应用于相应列的定义。</p>
+            <p>
+                例如，要使 population 列可为空，请使用以下代码：
+            </p>
+            <code-block lang="kotlin">
+                // SQL: POPULATION INT NULL
+                val population: Column&lt;Int?&gt; = integer(&quot;population&quot;).nullable()
+            </code-block>
+        </chapter>
+        <chapter title="默认值" id="default">
+            <p><code>DEFAULT</code> SQL 约束为列提供默认值。Exposed 支持三种配置默认值的方法：</p>
+            <list>
+                <li>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/default.html">
+                        <code>.default(defaultValue: T)</code>
+                    </a>
+                    接受一个与列类型相同的值。
+                </li>
+                <li>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/default-expression.html">
+                        <code>.defaultExpression(defaultValue: Expression&lt;T&gt;)</code>
+                    </a>
+                    接受一个表达式。
+                </li>
+                <li>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/client-default.html">
+                        <code>.clientDefault(defaultValue: () -&gt; T)</code>
+                    </a>
+                    接受一个函数。
+                </li>
+            </list>
+            <p>
+                例如，要为 <code>name</code> 列配置默认值，请使用以下代码：
+            </p>
+            <code-block lang="kotlin">
+                // SQL: &quot;NAME&quot; VARCHAR(50) DEFAULT 'Unknown'
+                val name: Column&lt;String&gt; = varchar(&quot;name&quot;, 50).default(&quot;Unknown&quot;)
+            </code-block>
+            <p>Exposed 还支持将列标记为 <code>databaseGenerated</code>，如果列的默认值在表创建时未知和/或依赖于其他列。这使得在插入新记录时可以省略为该列设置值，而不会出现错误。该列的值可以通过创建 <code>TRIGGER</code> 或使用 <code>DEFAULT</code> 子句来设置。</p>
+            <p>例如：</p>
+
+            <code-block lang="kotlin">
+                val name: Column&lt;String&gt; = varchar(&quot;name&quot;, 50).databaseGenerated()
+            </code-block>
+        </chapter>
+        <chapter title="索引" id="index">
+            <p>
+                <code>INDEX</code> SQL 约束使表遍历更快。Exposed 支持
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/--index--.html">
+                    <code>.index()</code>
+                </a>
+                方法。它有六个参数，其中大部分是可选的：
+            </p>
+            <deflist>
+                <def id="customIndexName">
+                    <title><code>customIndexName: String? = null</code></title>
+                    索引的自定义名称，将在实际 SQL 查询中使用。
+                </def>
+                <def id="unique-param">
+                    <title><code>unique: Boolean</code></title>
+                    定义索引是否唯一。
+                </def>
+                <def title="" id="columns">
+                    <title><code>columns: List&lt;Column&lt;*&gt;&gt;</code></title>
+                    定义列集。
+                </def>
+                <def id="functions">
+                    <title><code>functions: List&lt;ExpressionWithColumnType&lt;*&gt;&gt;? = null</code></title>
+                    定义函数键部分。
+                </def>
+                <def id="indexType">
+                    <title><code>indexType: String? = null</code></title>
+                    自定义类型。可以是 <code>&quot;BTREE&quot;</code> 或 <code>&quot;HASH&quot;</code>。
+                </def>
+                <def id="filterCondition">
+                    <title><code>filterCondition: (() -&gt; Op&lt;Boolean&gt;)? = null</code></title>
+                    定义用于创建部分索引的条件。
+                </def>
+            </deflist>
+            <p>创建索引最简单的方法是直接在列上使用扩展函数。例如，要对 <code>name</code> 列应用非唯一 <code>INDEX</code> 约束，请使用以下代码：</p>
+
+            <code-block lang="kotlin">
+                val name = varchar(&quot;name&quot;, 50).index()
+            </code-block>
+            <p>
+                如果未设置 <code>customIndexName</code> 参数，索引名称由表名和列名决定。
+            </p>
+            <chapter title="复合索引" id="complex-index">
+                <p>
+                    如果你经常查询两个列，Exposed 可以更高效地执行查询。它从第一个列创建一个树，并引用第二个列。例如，要在 <code>name</code> 和 <code>population</code> 列上创建非唯一复合索引，请使用以下代码：
+                </p>
+                <code-block lang="kotlin">
+                    val indexName = index(&quot;indexName&quot;, false, *arrayOf(name, population))
+                    // or inside an init block within the table object
+                    init {
+                        index(&quot;indexName&quot;, isUnique = false, name, population)
+                    }
+                </code-block>
+            </chapter>
+            <chapter title="自定义类型的索引" id="index-with-custom-type">
+                <p>
+                    Exposed 还支持创建自定义类型的索引。例如，要使用哈希函数遍历以更快地从 <code>name</code> 列检索数据，请使用以下代码：
+                </p>
+
+                <code-block lang="kotlin">
+                    val indexName = index(&quot;indexName&quot;, false, *arrayOf(name), indexType = &quot;HASH&quot;)
+                </code-block>
+            </chapter>
+
+            <p>某些数据库支持函数键部分，这些部分索引表达式而非直接索引列：</p>
+
+            <code-block lang="kotlin">
+                init {
+                    index(functions = listOf(name.lowerCase(), address.substring(1, 5)))
+                    uniqueIndex(
+                        columns = arrayOf(name),
+                        functions = listOf(Coalesce(address, stringLiteral(&quot;*&quot;)))
+                    )
+                }
+            </code-block>
+            <p>
+                运算符表达式（如 <code>plus()</code>）也被 <code>functions</code> 参数接受。
+            </p>
+            <p>
+                某些数据库支持通过定义过滤表达式创建部分索引以提高查询性能。创建的索引将只包含与此谓词匹配的表行的条目：
+            </p>
+            <code-block lang="kotlin">
+                init {
+                    index(columns = arrayOf(name, flag)) { flag eq true }
+                    index(
+                        columns = arrayOf(
+                            name,
+                            population
+                        )
+                    ) { (name like &quot;A%&quot;) and (population greaterEq 10) }
+                }
+            </code-block>
+            <chapter title="访问索引" id="access-indices">
+                <p>
+                    创建表后，可以使用 <code>Table.indices</code> 属性访问其索引列表。表索引由数据类
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-index/index.html">
+                        <code>Index</code>
+                    </a>
+                    表示，因此可以通过以下方式检查其属性：</p>
+                <code-block lang="kotlin">
+                    Table.indices.map { it.indexName to it.createStatement().first() }
+                </code-block>
+            </chapter>
+            <note>
+                <code>Index</code> 数据类的实例可以直接使用其公共构造函数创建，例如用于评估或使用 create/modify/drop 语句。这样做不会像使用 <code>index()</code> 那样将实例添加到现有表的索引列表中。此外，如果创建实例时向 <code>functions</code> 参数提供了参数，则还必须提供 <code>functionsTable</code> 参数。
+            </note>
+        </chapter>
+        <chapter title="唯一" id="unique">
+            <p>
+                <code>UNIQUE</code> SQL 约束限制列中的重复值。Exposed 支持
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/unique-index.html">
+                    <code>.uniqueIndex()</code>
+                </a>
+                方法，该方法为列创建唯一索引。此方法是 <code>UNIQUE</code> 和 <code>INDEX</code> 约束的组合，是 <code>UNIQUE</code> 约束的更快修改方式。
+            </p>
+            <p>
+                例如，要对 <code>name</code> 列应用 <code>UNIQUE</code> 和 <code>INDEX</code> 约束，请使用以下代码：
+            </p>
+            <code-block lang="kotlin">
+                val name = varchar(&quot;name&quot;, 50).uniqueIndex()
+            </code-block>
+        </chapter>
+        <chapter title="主键" id="primary-key">
+            <p>
+                应用于列的 <code>PRIMARY KEY</code> SQL 约束意味着该列中的每个值都标识一行。此约束是 <code>NOT NULL</code> 和 <code>UNIQUE</code> 约束的组合。要更改列集、添加列或将主键名称更改为自定义名称，请覆盖表类的此字段。
+            </p>
+            <p>
+                例如，要将 <code>name</code> 列定义为主键，请使用以下代码。如果提供了 "Cities_name" 字符串，将在实际 SQL 查询中用作约束名称；否则将根据表名生成名称。
+            </p>
+            <code-block lang="kotlin">
+                override val primaryKey = PrimaryKey(name, name = &quot;Cities_name&quot;)
+            </code-block>
+
+            <code-block lang="sql">
+                CONSTRAINT Cities_name PRIMARY KEY (&quot;name&quot;)
+            </code-block>
+            <p>
+                也可以使用多列定义表的主键：
+            </p>
+            <code-block lang="kotlin">
+                override val primaryKey = PrimaryKey(id, name)
+            </code-block>
+
+            <code-block lang="sql">
+                CONSTRAINT pk_Cities PRIMARY KEY (ID, &quot;name&quot;)
+            </code-block>
+            <p>
+                除 <code>CompositeIdTable</code> 外，Exposed 中继承自 <code>IdTable</code> 的每个可用类都自动定义了 <code>primaryKey</code> 字段。例如，<code>IntIdTable</code> 默认有一个自增整数列 <code>id</code>，它被定义为主键。
+            </p>
+            <p>
+                需要多列主键的 <code>IdTable</code> 可以使用 <code>CompositeIdTable</code> 定义。在这种情况下，作为表 ID 组成部分的每个列都应通过 <code>.entityId()</code> 标识：
+            </p>
+
+            <code-block lang="kotlin">
+                object Towns : CompositeIdTable(&quot;towns&quot;) {
+                    val areaCode = integer(&quot;area_code&quot;).autoIncrement().entityId()
+                    val latitude = decimal(&quot;latitude&quot;, 9, 6).entityId()
+                    val longitude = decimal(&quot;longitude&quot;, 9, 6).entityId()
+                    val name = varchar(&quot;name&quot;, 32)
+
+                    override val primaryKey = PrimaryKey(areaCode, latitude, longitude)
+                }
+            </code-block>
+            <p id="add-id-column-tip">
+                如果任何键组成列已在另一个表中通过 <code>.entityId()</code> 标记，仍然可以使用 <code>addIdColumn()</code> 进行标识。这对于引用另一个 <code>IdTable</code> 的键列可能很有用：</p>
+            <code-block lang="kotlin">
+                object AreaCodes : IdTable&lt;Int&gt;("area_codes") {
+                    override val id = integer("code").entityId()
+                    override val primaryKey = PrimaryKey(id)
+                }
+
+                object Towns : CompositeIdTable("towns") {
+                    val areaCode = reference("area_code", AreaCodes)
+                    val latitude = decimal("latitude", 9, 6).entityId()
+                    val longitude = decimal("longitude", 9, 6).entityId()
+                    val name = varchar("name", 32)
+
+                    init {
+                        addIdColumn(areaCode)
+                    }
+
+                    override val primaryKey = PrimaryKey(areaCode, latitude, longitude)
+                }
+            </code-block>
+            <tip>有关 <code>CompositeIdTable</code> 类型的更多信息，请参见 <a
+                    href="DAO-Table-Types.topic">DAO 表类型</a>。
+            </tip>
+        </chapter>
+        <chapter title="外键" id="foreign-key">
+            <p>
+                <code>FOREIGN KEY</code> SQL 约束链接两个表。外键是一个表中的一列，它引用另一个表的主键或具有唯一索引的列。要在列上配置外键，请使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/reference.html">
+                    <code>reference()</code>
+                </a>
+                或
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/opt-reference.html">
+                    <code>optReference()</code>
+                </a>
+                方法。后者允许外键接受 <code>null</code> 值。要在多列上配置外键，请在 <code>init</code> 块中直接使用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/foreign-key.html">
+                    <code>foreignKey()</code>
+                </a>
+                函数。
+            </p>
+            <p><code>reference()</code> 和 <code>optReference()</code> 方法有多个参数：</p>
+            <deflist>
+                <def id="name">
+                    <title><code>name: String</code></title>
+                    <p>外键列的名称，将在实际 SQL 查询中使用。</p>
+                </def>
+                <def id="ref">
+                    <title><code>ref: Column&lt;T&gt;</code></title>
+                    <p>另一个父表中的目标列。</p>
+                </def>
+                <def id="onDelete">
+                    <title><code>onDelete: ReferenceOption? = null</code></title>
+                    <p>当父表中的链接行被删除时的操作。</p>
+                </def>
+                <def id="onUpdate">
+                    <title><code>onUpdate: ReferenceOption? = null</code></title>
+                    <p>当引用列中的值被更改时的操作。</p>
+                </def>
+                <def id="fkName">
+                    <title><code>fkName: String? = null</code></title>
+                    <p>外键约束的名称。</p>
+                </def>
+            </deflist>
+            <p>
+                枚举类
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-reference-option/index.html">
+                    <code>ReferenceOption</code>
+                </a>
+                有五个值：
+            </p>
+            <deflist type="narrow">
+                <def id="restrict-def">
+                    <title><code>RESTRICT</code></title>
+                    <p>限制对引用列进行更改的选项，是大多数方言的默认选项。</p>
+                </def>
+                <def id="no-action-def">
+                    <title><code>NO_ACTION</code></title>
+                    <p>在某些（但不是所有）数据库中与 <code>RESTRICT</code> 相同，是 Oracle 和 SQL Server 方言的默认选项。</p>
+                </def>
+                <def id="cascade-def">
+                    <title><code>CASCADE</code></title>
+                    <p>允许更新或删除引用行的选项。</p>
+                </def>
+                <def id="set-null-def">
+                    <title><code>SET_NULL</code></title>
+                    <p>将引用列值设置为 <code>null</code> 的选项。</p>
+                </def>
+                <def id="set-default-def">
+                    <title><code>SET_DEFAULT</code></title>
+                    <p>将引用列值设置为默认值的选项。</p>
+                </def>
+            </deflist>
+            <p>考虑以下 <code>Citizens</code> 表。此表有 <code>name</code> 和 <code>city</code> 列。如果 <code>Cities</code> 表已将 <code>name</code> 列配置为主键，则 <code>Citizens</code> 表可以通过其 <code>city</code> 列（外键）引用它。要配置此类引用并使其可为空，请使用 <code>optReference()</code> 方法：</p>
+
+            <code-block lang="kotlin">
+                object Citizens : IntIdTable() {
+                    val name = varchar(&quot;name&quot;, 50)
+                    val city = optReference(&quot;city&quot;, Cities.name, onDelete = ReferenceOption.CASCADE)
+                }
+            </code-block>
+            <p>如果任何 <code>Cities</code> 行被删除，相应的 <code>Citizens</code> 行也将被删除。</p>
+            <p>如果 <code>Cities</code> 表将多列配置为主键（例如，如上 <a anchor="primary-key">主键</a> 部分中的 <code>id</code> 和 <code>name</code> 列），则 <code>Citizens</code> 表可以使用表级外键约束引用它。在这种情况下，<code>Citizens</code> 表必须定义匹配的列来存储 <code>Cities</code> 表主键的每个组成部分值：</p>
+
+            <code-block lang="kotlin">
+                object Citizens : IntIdTable() {
+                    val name = varchar(&quot;name&quot;, 50)
+                    val cityId = integer(&quot;city_id&quot;)
+                    val cityName = varchar(&quot;city_name&quot;, 50)
+
+                    init {
+                        foreignKey(cityId, cityName, target = Cities.primaryKey)
+                    }
+                }
+            </code-block>
+            <p>在上面的示例中，<code>foreignKey()</code> 中引用列的顺序必须与目标主键中定义的列顺序匹配。如果此顺序不确定，可以使用显式列关联定义外键：</p>
+
+            <code-block lang="kotlin">
+                init {
+                    foreignKey(cityId to Cities.id, cityName to Cities.name)
+                }
+            </code-block>
+        </chapter>
+        <chapter title="检查" id="check">
+            <p>
+                <code>CHECK</code> SQL 约束检查列中的所有值是否匹配某个条件。Exposed 支持
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/check.html">
+                    <code>.check()</code>
+                </a>
+                方法。你将此方法应用于列并传递相应的条件。
+            </p>
+            <p>
+                例如，要检查 <code>name</code> 列是否包含以大写字母开头的字符串，请使用以下代码：
+            </p>
+            <code-block lang="kotlin">
+                // SQL: CONSTRAINT check_Cities_0 CHECK (REGEXP_LIKE(&quot;NAME&quot;, '^[A-Z].*', 'c')))
+                val name = varchar(&quot;name&quot;, 50).check { it regexp &quot;^[A-Z].*&quot; }
+            </code-block>
+            <p>某些数据库（如旧版本的 MySQL）可能不支持 <code>CHECK</code> 约束。有关更多信息，请参阅相关文档。</p>
+        </chapter>
+    </chapter>
+    <chapter title="创建表" id="dsl-create-table">
+        <p>
+            要在数据库中创建表，你需要在
+            <a href="Transactions.md">
+                事务
+            </a>
+            中使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/-schema-utils/create.html">
+                <code>SchemaUtils.create()</code>
+            </a>
+            方法：
+        </p>
+        <code-block lang="kotlin">
+            transaction {
+                SchemaUtils.create(StarWarsFilms)
+                //...
+            }
+        </code-block>
+        <p>
+            这将根据你的定义生成创建表所需的 SQL。
+        </p>
+    </chapter>
+
+</topic>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="数值、布尔和字符串" id="Numeric-Boolean-String-Types">
+    <show-structure for="chapter" depth="2"/>
+    <tldr>
+        <p>
+            <b>必需依赖</b>: <code>org.jetbrains.exposed:exposed-core</code>
+        </p>
+        <include from="lib.topic" element-id="jdbc-supported"/>
+        <include from="lib.topic" element-id="r2dbc-supported"/>
+    </tldr>
+     <p>
+         <code>exposed-core</code> 模块支持各种
+         <a anchor="numeric-types">数值类型</a>
+         、
+         <a anchor="bool-type">布尔类型</a>
+         和
+         <a anchor="string-types">字符串类型</a>
+         。
+     </p>
+    <chapter title="基本用法" id="basic-usage">
+        <p>以下是在表定义中使用不同数据类型的示例：</p>
+        <code-block lang="kotlin"
+                    src="exposed-data-types/src/main/kotlin/org/example/examples/BasicTypesExamples.kt"
+                    include-lines="3,10-28"
+        />
+    </chapter>
+    <chapter title="数值类型" id="numeric-types">
+        <deflist type="medium">
+            <def id="integer-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/integer.html">
+                        <code>integer()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>INT</code>。用于存储 -2^31 到 2^31-1 范围内的整数。</p>
+            </def>
+            <def id="short-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/short.html">
+                        <code>short()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>SMALLINT</code>。用于存储 -32,768 到 32,767 范围内的较小整数。</p>
+            </def>
+            <def id="long-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/long.html">
+                        <code>long()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>BIGINT</code>。用于存储 -2^63 到 2^63-1 范围内的大整数。</p>
+            </def>
+            <def id="float-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/float.html">
+                        <code>float()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>FLOAT</code>。用于存储近似十进制数。</p>
+                <list>
+                    <li>PostgreSQL: 映射到 <code>REAL</code></li>
+                </list>
+            </def>
+            <def id="decimal-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/decimal.html">
+                        <code>decimal()</code>
+                    </a>
+                </title>
+                <p>映射到具有指定精度和小数位数的数据库 <code>DECIMAL</code>。用于存储精度重要的精确十进制数。</p>
+            </def>
+        </deflist>
+    </chapter>
+    <chapter title="布尔类型" id="boolean-type">
+        <deflist type="medium">
+            <def id="bool-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/bool.html">
+                        <code>bool()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>BOOLEAN</code>。用于存储 true/false 值。</p>
+                <p>数据库特定映射：</p>
+                <list>
+                    <li>Oracle: 映射到 <code>CHAR(1)</code></li>
+                    <li>SQLServer: 映射到 <code>BIT</code></li>
+                </list>
+            </def>
+        </deflist>
+    </chapter>
+    <chapter title="字符串类型" id="string-types">
+        <deflist type="medium">
+            <def id="char-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/char.html">
+                        <code>char()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>CHAR</code>。用于存储固定长度的字符串。</p>
+            </def>
+            <def id="varchar-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/varchar.html">
+                        <code>varchar()</code>
+                    </a>
+                </title>
+                <p>映射到具有指定长度的数据库 <code>VARCHAR</code>。用于存储有最大长度限制的可变长度字符串。</p>
+            </def>
+            <def id="text-type">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/text.html">
+                        <code>text()</code>
+                    </a>
+                </title>
+                <p>映射到数据库 <code>TEXT</code>。用于存储无长度限制的大型可变长度字符串。</p>
+            </def>
+        </deflist>
+    </chapter>
+</topic>

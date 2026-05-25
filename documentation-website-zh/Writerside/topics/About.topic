@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="Exposed，Kotlin 的 ORM 框架" id="About">
+    <p>
+        Exposed 是一个基于 JDBC 驱动的轻量级 SQL 库，专为 Kotlin 编程语言设计。它支持
+        JDBC（阻塞式）和 R2DBC（非阻塞式）驱动，让您能够灵活选择传统或
+        响应式数据库访问模型。
+    </p>
+    <p>
+        它提供两种数据库访问方式：领域特定语言（DSL）API 和数据访问对象
+        （DAO）API。
+    </p>
+    <p>
+        Exposed 的领域特定语言（DSL）API 提供了一种基于 Kotlin 的数据库交互抽象层。
+        它紧密<a href="DSL-CRUD-operations.topic">映射实际的 SQL 语句</a>，让您能够使用
+        熟悉的 SQL 概念，同时享受 Kotlin 提供的类型安全。
+    </p>
+    <p>
+        <a href="DAO-CRUD-Operations.topic">数据访问对象（DAO）API</a> 提供了一种面向对象的数据库交互方式，
+        类似于传统的对象关系映射（ORM）框架，如 Hibernate。
+        此 API 更简洁，提供了一种更直观且以 Kotlin 为中心的数据库交互方式。
+    </p>
+    <p>
+        Exposed 的灵活性使您能够选择最适合项目需求的方式，无论是
+        使用 DSL API 直接控制 SQL，还是使用 DAO API 的更高层次抽象。
+    </p>
+    <chapter title="支持的数据库" id="supported-databases">
+        <p>
+            类似于其墨鱼吉祥物能够无缝融入任何环境，Exposed 能够适应不同的
+            数据库引擎，并允许在几乎不修改代码的情况下切换数据库。
+        </p>
+        Exposed 目前支持以下数据库：
+        <list>
+            <li>
+                <a href="https://www.h2database.com/html/main.html">H2</a>（版本 2.x）
+            </li>
+            <li>
+                <a href="https://github.com/mariadb-corporation/mariadb-connector-j">MariaDB</a>
+            </li>
+            <li>
+                <a href="https://github.com/mysql/mysql-connector-j">MySQL</a>
+            </li>
+            <li>
+                <a href="https://www.oracle.com/ca-en/database/technologies/appdev/jdbc-downloads.html">Oracle</a>
+            </li>
+            <li>
+                <a href="https://jdbc.postgresql.org/">PostgreSQL</a>（以及使用
+                <a href="https://impossibl.github.io/pgjdbc-ng/">pgjdbc-ng</a> JDBC 驱动的 PostgreSQL）
+            </li>
+            <li>
+                <a href="https://github.com/microsoft/mssql-jdbc">Microsoft SQL Server</a>
+            </li>
+            <li>
+                <a href="https://github.com/xerial/sqlite-jdbc">SQLite</a>
+            </li>
+        </list>
+    </chapter>
+    <seealso style="cards">
+        <category ref="learn-more">
+            <a href="Adding-dependencies.md"/>
+            <a href="Get-Started-with-Exposed.topic"/>
+        </category>
+    </seealso>
+</topic>

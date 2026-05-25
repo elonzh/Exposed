@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="连接表" id="DSL-Joining-tables" help-id="Joining-tables">
+
+    <show-structure for="chapter,procedure" depth="2"/>
+    <chapter title="Join" id="join">
+        <p>对于以下连接示例，请参考以下表：</p>
+        <tabs>
+            <tab id="StarWarsFilmsIntIdTable" title="StarWarsFilmsIntIdTable">
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/tables/StarWarsFilmsIntIdTable.kt"/>
+            </tab>
+            <tab id="ActorsIntIdTable" title="ActorsIntIdTable">
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/tables/ActorsIntIdTable.kt"/>
+            </tab>
+            <tab id="RolesTable" title="RolesTable">
+                <code-block lang="kotlin"
+                            src="exposed-dsl/src/main/kotlin/org/example/tables/RolesTable.kt"/>
+            </tab>
+        </tabs>
+        <p>
+            在以下示例中，使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-column-set/join.html">
+                <code>.join()</code>
+            </a>
+            函数来统计每部电影中有多少演员出演：
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                    include-lines="19-26"/>
+        <p>
+            除了指定 <code>onColumn</code> 和 <code>otherColumn</code> 外，还可以使用 <code>additionalConstraint</code>，
+            这允许指定其他类型的连接条件。
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                    include-lines="30-36"/>
+        <chapter title="基于外键连接" id="inner-join">
+            <p>
+                当基于外键进行连接时，可以使用更简洁的
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-column-set/inner-join.html">
+                    <code>innerJoin</code>
+                </a>：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                        include-lines="40-43"/>
+            <p>
+                这等同于使用带有 <code>JoinType.INNER</code> 的 <code>.join()</code>：
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                        include-lines="47-50"/>
+        </chapter>
+    </chapter>
+    <chapter title="Union" id="union">
+        <p>
+            要合并多个查询的结果，请使用
+            <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/union.html">
+                <code>.union()</code>
+            </a>
+            函数。根据 SQL 规范，查询必须具有相同数量的列，且不能标记为更新。
+            当数据库支持时，可以合并子查询。
+        </p>
+        <code-block lang="kotlin"
+                    src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                    include-symbol="lucasDirectedQuery,abramsDirectedQuery,filmNames"/>
+        <chapter title="包含重复项" id="union-all">
+            <p>
+                默认情况下，<code>.union()</code> 仅返回唯一行。要在结果中包含重复项，请改用
+                <a href="https://jetbrains.github.io/Exposed/api/exposed-jdbc/org.jetbrains.exposed.v1.jdbc/union-all.html">
+                    <code>.unionAll()</code>
+                </a>
+                函数。
+            </p>
+            <code-block lang="kotlin"
+                        src="exposed-dsl/src/main/kotlin/org/example/examples/JoinExamples.kt"
+                        include-symbol="lucasDirectedQuery,originalTrilogyQuery,allFilmNames"/>
+        </chapter>
+    </chapter>
+</topic>

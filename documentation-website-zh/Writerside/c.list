@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE categories
+        SYSTEM "https://helpserver.labs.jb.gg/help/schemas/mvp/categories.dtd">
+<categories>
+    <category id="wrs" name="Writerside documentation" order="1"/>
+    <category id="related" name="Related topics" order="2"/>
+    <category id="learn-more" name="Learn more" order="3"/>
+</categories>
