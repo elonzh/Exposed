@@ -53,7 +53,9 @@ bash documentation-website-zh/scripts/commit.sh
 
 - 自动添加 `upstream` remote（如果不存在）
 - 检测上游是否有文档变更
+- 检测目录结构变更（文件重命名、移动）
 - 合并上游 `main` 分支
+- 智能处理合并冲突（文档冲突保留中文版本）
 
 ### sync.sh
 
@@ -67,8 +69,10 @@ bash documentation-website-zh/scripts/commit.sh
 
 检测需要翻译的文件：
 
-- 对比上次同步 commit 与当前 HEAD 的差异
-- 检测英文目录中新增的文件
+- 使用 git tag (`docs-zh-sync-*`) 标记同步点
+- 对比上次同步 tag 与当前 HEAD 的差异
+- 检测英文目录中新增、修改、删除的文件
+- 跳过翻译时间比原文新的文件（已是最新）
 - 支持 `--all` 参数强制翻译所有文件
 
 ### commit.sh
@@ -78,7 +82,8 @@ bash documentation-website-zh/scripts/commit.sh
 - 自动配置 git user（CI 环境）
 - 暂存中文文档目录的变更
 - 创建带时间戳的 commit
-- CI 环境下自动推送到 origin
+- 创建 git tag (`docs-zh-sync-YYYYMMDD-HHMMSS`) 标记同步点
+- CI 环境下自动推送到 origin（包含 tags）
 
 ### build.sh
 
