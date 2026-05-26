@@ -1,12 +1,17 @@
 {
-  "name": "Exposed Doc ZH Sync",
-  "image": "mcr.microsoft.com/devcontainers/java:1-21",
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
-  },
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
-  "runArgs": ["--env-file", ".env"],
-  "postCreateCommand": "bash .devcontainer/doc-zh/setup.sh"
+    "name": "Exposed Doc ZH Sync",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    },
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "runArgs": [
+        "--init",
+        "--env-file",
+        ".env"
+    ],
+    "postCreateCommand": "bash .devcontainer/doc-zh/setup.sh"
 }

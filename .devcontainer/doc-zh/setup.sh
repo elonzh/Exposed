@@ -4,20 +4,20 @@ set -e
 echo "=== Setting up Exposed Doc ZH Sync ==="
 
 # Install opencode CLI
-if ! command -v opencode &> /dev/null; then
-    echo "Installing opencode..."
-    curl -fsSL https://opencode.ai/install | bash
-    export PATH="$HOME/.local/bin:$PATH"
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-else
-    echo "opencode already installed."
-fi
+npm install -g opencode-ai
 
 # Check Docker
 if [ -S /var/run/docker.sock ]; then
     echo "Docker socket: OK"
 else
     echo "WARNING: Docker socket not found. build.sh will not work."
+fi
+
+# Check Docker command
+if command -v docker &> /dev/null; then
+    echo "Docker command: OK"
+else
+    echo "WARNING: Docker command not found. Please ensure Docker CLI is installed."
 fi
 
 # Make scripts executable
