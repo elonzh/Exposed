@@ -39,7 +39,7 @@ java {
 }
 ```
 
-## 添加依赖
+## 添加依赖 {#add-dependencies}
 
 ### Spring Boot 4
 

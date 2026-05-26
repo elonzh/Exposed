@@ -18,11 +18,11 @@ Exposed 支持多种数据类型，包括[基本数据类型](Numeric-Boolean-St
 
 你可以使用 [`IColumnType`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-i-column-type/index.html) 接口实现自定义列类型，并使用 [`registerColumn()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/register-column.html) 将其注册到表。有关更多信息，请参阅[自定义数据类型](Custom-data-types.topic)文档。
 
-### 是否可以在没有数据库连接的情况下生成 SQL？
+### 是否可以在没有数据库连接的情况下生成 SQL？ {#generate-sql-without-connection}
 
 不可以，Exposed 需要数据库连接才能生成 SQL。SQL 生成依赖于数据库方言和事务上下文，这两者都由活动数据库连接确定。由于 Exposed 会根据底层数据库动态调整查询，因此即使查询从未执行，也需要连接。
 
-### 如何获取将要执行的原始 SQL 查询？
+### 如何获取将要执行的原始 SQL 查询？ {#get-raw-sql-query}
 
 你可以使用 [`Statement.prepareSQL()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.statements/-statement/prepare-s-q-l.html) 函数，以及可能的 [`buildStatement()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core.statements/build-statement.html) 函数。有关更多详情，请参见 [](DSL-Statement-Builder.md)。
 

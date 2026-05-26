@@ -12,7 +12,7 @@
 2. [实现自定义 `TypeMapper`](#implementing-a-typemapper) 以绑定这些列类型的值。
 3. [注册您的映射器](#registering-the-type-mapper) 使其在内置的 `PostgresSpecificTypeMapper` 之前生效。
 
-## 定义自定义列类型
+## 定义自定义列类型 {#defining-a-custom-column-type}
 
 自定义列类型负责生成适当的 SQL 类型以及在数据库表示和值之间进行转换。
 
@@ -54,7 +54,7 @@ abstract class RangeR2dbcColumnType<T : Comparable<T>, R : ClosedRange<T>>(
 
 具体子类（如 `IntRangeColumnType`）可以实现 `.toRange()` 来处理解析。更多信息请参阅 [](Custom-data-types.topic#ranges-of-data)。
 
-## 实现 `TypeMapper`
+## 实现 `TypeMapper` {#implementing-a-typemapper}
 
 `TypeMapper` 负责根据方言和列类型将 Kotlin 值绑定到 R2DBC `Statement` 参数。
 
@@ -108,7 +108,7 @@ class CustomTypeMapper : TypeMapper {
 
 此实现确保 Exposed 能够在运行时正确序列化这些自定义类型。
 
-## 注册类型映射器
+## 注册类型映射器 {#registering-the-type-mapper}
 
 Exposed 使用 Java SPI `ServiceLoader` 来发现和加载此接口的任何实现。
 要注册您的映射器，应在 **resources** 文件夹中创建一个新文件。

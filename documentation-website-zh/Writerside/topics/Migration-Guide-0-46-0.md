@@ -91,7 +91,7 @@ val originalQuery = TestTable.selectAll().where { TestTable.columnA eq 1 }
 originalQuery.adjustSelect { select(TestTable.columnA) }
 ```
 
-### 迁移步骤
+### 迁移步骤 {#migration-steps}
 
 1. 使用 *Edit > Find > Find in Files...* 查找 `adjustSlice` 的任何用法，然后使用 `Alt+Enter` 快速修复并选择"Replace usages of '...' in whole project"。
 2. 对以下列表中的所有弃用方法重复步骤 1：

@@ -32,7 +32,7 @@
 
 ## 导入版本控制和包重命名
 
-### 更新的导入
+### 更新的导入 {#updated-imports}
 
 所有依赖已更新为遵循 `org.jetbrains.exposed.v1.packageName.*` 的导入路径模式。这在包命名中引入了两个关键变化：每个模块和构件的唯一前缀，以及额外的 `v1` 前缀。
 
@@ -996,7 +996,7 @@ val statusCase = ValueCase(Books.isOverdue)
 
 </compare>
 
-## 结果包装器
+## 结果包装器 {#result-wrappers}
 
 两个新的 `exposed-core` 接口 `ResultApi` 和 `RowApi` 已被引入，以表示 JDBC（`java.sql.ResultSet`）和 R2DBC（`io.r2dbc.spi.Result`）查询执行结果之间的共性。两者都由新的驱动特定包装类 `JdbcResult` 和 `R2dbcResult` 实现。
 

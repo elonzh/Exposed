@@ -35,7 +35,7 @@
 
 ## 代码
 
-### 拉取请求
+### 拉取请求 {#pull-requests}
 
 贡献通过 GitHub [拉取请求](https://help.github.com/en/articles/about-pull-requests)进行：
 
@@ -81,7 +81,7 @@
 * 在测试函数的定义中，使用块体而不是赋值运算符。
   例如，写 `fun testMyTest() { withDb{} }`，避免写 `fun testMyTest() = withDb{}`。
 
-### 提交消息
+### 提交消息 {#commit-messages}
 
 * 提交消息应使用英文编写。
 * 标题应根据[约定式提交](https://www.conventionalcommits.org/en/v1.0.0/#summary)添加前缀。

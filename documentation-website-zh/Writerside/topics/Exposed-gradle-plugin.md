@@ -32,7 +32,7 @@ plugins {
 }
 ```
 
-## 生成迁移脚本
+## 生成迁移脚本 {#generate-migration-scripts}
 
 要基于现有数据库模式与 Exposed 表定义之间的差异生成迁移脚本，请使用 `generateMigrations` 任务：
 
@@ -177,7 +177,7 @@ exposed {
 }
 ```
 
-## 版本格式
+## 版本格式 {#version-formats}
 
 插件支持以下 `VersionFormat` 值：
 <deflist>
