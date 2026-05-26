@@ -44,43 +44,15 @@ jobs:
 
   build-image:
     needs: sync-docs
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/exposed-docs-zh
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=
-            type=schedule,pattern={{date 'YYYYMMDD'}}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: documentation-website-zh
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    uses: ./.github/workflows/build-docs-zh-image.yml
+    secrets: inherit
 
   notify:
     runs-on: ubuntu-latest
     needs: [sync-docs, build-image]
     if: always()
     steps:
+      # Pin to v4: https://github.com/actions/checkout/issues/2299
       - name: Checkout repository
         uses: actions/checkout@v4
 

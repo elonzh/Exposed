@@ -1,3 +1,4 @@
+# https://www.jetbrains.com/help/writerside/build-with-docker.html
 # Stage 1: Build Writerside documentation
 FROM jetbrains/writerside-builder:2026.04.8711 AS writerside-build
 
@@ -28,9 +29,9 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=writerside-build /opt/wrs-output/ /tmp/wrs-output/
 RUN cd /tmp/wrs-output && \
     if [ -f "webHelpHI_ZH2-all.zip" ]; then \
-        unzip -O UTF-8 webHelpHI_ZH2-all.zip -d /usr/share/nginx/html/ ; \
+        unzip webHelpHI_ZH2-all.zip -d /usr/share/nginx/html/ ; \
     elif [ -f "webHelpHI_ZH2.zip" ]; then \
-        unzip -O UTF-8 webHelpHI_ZH2.zip -d /usr/share/nginx/html/ ; \
+        unzip webHelpHI_ZH2.zip -d /usr/share/nginx/html/ ; \
     fi && \
     rm -rf /tmp/wrs-output
 
@@ -38,7 +39,7 @@ RUN cd /tmp/wrs-output && \
 COPY docs/api/ /usr/share/nginx/html/api/
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY documentation-website-zh/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
