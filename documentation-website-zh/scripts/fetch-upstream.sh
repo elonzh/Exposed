@@ -25,7 +25,11 @@ fi
 
 # Fetch upstream
 echo "Fetching from $UPSTREAM_URL..."
-git fetch upstream --quiet
+if ! git fetch upstream --quiet; then
+    echo "ERROR: Failed to fetch from upstream ($UPSTREAM_URL)"
+    echo "Please check network connectivity and try again."
+    exit 1
+fi
 
 # Check for structural changes before merging
 echo "Checking for structural changes..."

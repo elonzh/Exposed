@@ -1,9 +1,6 @@
 ---
 name: exposed-docs-sync
-description: >-
-同步并翻译 Exposed ORM 文档（英文→中文）。
-当需要同步上游文档变更、翻译新增/修改的 topic 文件、
-构建中文文档站点或更新 Docker 镜像时使用此技能。
+description: "同步并翻译 Exposed ORM 文档（英文→中文）。 当需要同步上游文档变更、翻译新增/修改的 topic 文件、 构建中文文档站点或更新 Docker 镜像时使用此技能。"
 ---
 
 # Exposed 文档同步与翻译
