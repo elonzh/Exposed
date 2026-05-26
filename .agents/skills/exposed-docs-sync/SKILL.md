@@ -1,9 +1,9 @@
 ---
 name: exposed-docs-sync
 description: >-
-  同步并翻译 Exposed ORM 文档（英文→中文）。
-  当需要同步上游文档变更、翻译新增/修改的 topic 文件、
-  构建中文文档站点或更新 Docker 镜像时使用此技能。
+同步并翻译 Exposed ORM 文档（英文→中文）。
+当需要同步上游文档变更、翻译新增/修改的 topic 文件、
+构建中文文档站点或更新 Docker 镜像时使用此技能。
 ---
 
 # Exposed 文档同步与翻译
@@ -103,14 +103,14 @@ bash documentation-website-zh/scripts/commit.sh
    # 查看英文文档的具体变更
    git diff <last-sync-tag> HEAD -- documentation-website/Writerside/topics/<file>
    ```
-   - 只翻译变更的部分，保留已有的中文翻译
-   - 对于新增内容，在现有翻译基础上追加
-   - 对于修改内容，对比差异后更新对应段落
+    - 只翻译变更的部分，保留已有的中文翻译
+    - 对于新增内容，在现有翻译基础上追加
+    - 对于修改内容，对比差异后更新对应段落
 
 2. **判断翻译范围**
-   - 文件状态为 `[M]`（修改）：查看 diff，只翻译变更的段落
-   - 文件状态为 `[+]`（新增）：全文件翻译
-   - 文件状态为 `[-]`（删除）：删除对应的中文文件
+    - 文件状态为 `[M]`（修改）：查看 diff，只翻译变更的段落
+    - 文件状态为 `[+]`（新增）：全文件翻译
+    - 文件状态为 `[-]`（删除）：删除对应的中文文件
 
 ### 子代理并行翻译
 
@@ -121,24 +121,32 @@ bash documentation-website-zh/scripts/commit.sh
 ```
 # 示例：3个文件需要翻译
 # 主代理分发任务给子代理
-Task 1: 翻译 file-a.topic (diff-based)
-Task 2: 翻译 file-b.topic (full) 
-Task 3: 翻译 file-c.topic (diff-based)
+Task 1: 翻译 file-a.topic
+Task 2: 翻译 file-b.topic 
+Task 3: 翻译 file-c.topic
 ```
 
 **分发规则：**
+
 - 每个文件分配给独立的子代理
-- 子代理接收：英文原文路径、中文目标路径、diff 内容（如果是增量翻译）
+- 子代理自行执行 `git diff` 对比变更
+- 子代理自行判断是增量翻译还是全量翻译
 - 子代理返回：翻译完成的文件路径
 - 主代理汇总结果并验证
 
 **子代理任务模板：**
+
 ```
 翻译文件：<filename>
-模式：<incremental|full>
-英文文件：<en_file_path>
-中文文件：<zh_file_path>
-Diff 内容：<git diff output>  # 仅增量模式需要
+同步 tag：<last-sync-tag>  # 用于 git diff 对比
+英文目录：documentation-website/Writerside/topics/
+中文目录：documentation-website-zh/Writerside/topics/
+
+步骤：
+1. 执行 git diff <tag> HEAD -- <英文文件> 获取变更
+2. 如果是新增文件（中文不存在），执行全量翻译
+3. 如果是修改文件，读取现有中文翻译，只翻译变更部分
+4. 翻译完成后返回文件路径
 
 翻译规则：
 - 翻译人类可读文本，保留 XML 结构和代码块
@@ -173,25 +181,28 @@ Diff 内容：<git diff output>  # 仅增量模式需要
 
 ```markdown
 # 英文
+
 ### Core module
 
 # 中文（添加显式锚点）
+
 ### 核心模块 {#core-module}
 ```
 
 **需要添加锚点的情况：**
+
 - 标题被其他文件引用时
 - 标题被同一文件内的链接引用时
 
 ### 常见构建错误
 
-| 错误代码 | 原因 | 解决方案 |
-|---------|------|---------|
-| CDE005 | 代码片段文件缺失 | 检查 snippets 软链是否有效 |
-| REF004 | 引用锚点不存在 | 添加显式锚点 `{#id}` |
-| REF005 | 同文件内链接无锚点 | 添加锚点或修复链接 |
-| MRK003 | 重复的元素 ID | 为标题添加不同的锚点 |
-| VIS001 | 资源文件缺失 | 检查 resources 软链是否有效 |
+| 错误代码   | 原因        | 解决方案                |
+|--------|-----------|---------------------|
+| CDE005 | 代码片段文件缺失  | 检查 snippets 软链是否有效  |
+| REF004 | 引用锚点不存在   | 添加显式锚点 `{#id}`      |
+| REF005 | 同文件内链接无锚点 | 添加锚点或修复链接           |
+| MRK003 | 重复的元素 ID  | 为标题添加不同的锚点          |
+| VIS001 | 资源文件缺失    | 检查 resources 软链是否有效 |
 
 ### 验证清单
 
@@ -203,19 +214,19 @@ Diff 内容：<git diff output>  # 仅增量模式需要
 
 ## 术语表
 
-| 英文 | 中文 |
-|------|------|
-| Table | 表 |
-| Column | 列 |
-| Row | 行 |
-| Transaction | 事务 |
-| Query | 查询 |
-| Schema | 模式 |
-| Migration | 迁移 |
-| Primary Key | 主键 |
-| Foreign Key | 外键 |
-| Connection | 连接 |
-| Entity | 实体 |
-| DSL | DSL（领域特定语言） |
-| DAO | DAO（数据访问对象） |
-| ORM | ORM（对象关系映射） |
+| 英文          | 中文          |
+|-------------|-------------|
+| Table       | 表           |
+| Column      | 列           |
+| Row         | 行           |
+| Transaction | 事务          |
+| Query       | 查询          |
+| Schema      | 模式          |
+| Migration   | 迁移          |
+| Primary Key | 主键          |
+| Foreign Key | 外键          |
+| Connection  | 连接          |
+| Entity      | 实体          |
+| DSL         | DSL（领域特定语言） |
+| DAO         | DAO（数据访问对象） |
+| ORM         | ORM（对象关系映射） |
