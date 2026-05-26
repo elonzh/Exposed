@@ -92,6 +92,69 @@ bash documentation-website-zh/scripts/commit.sh
 - 使用 Docker 运行 Writerside builder
 - 解压构建产物到 `site/` 目录
 
+## 翻译工作流
+
+### 增量翻译策略
+
+**重要：避免全量重译，优先使用增量翻译。**
+
+1. **查看 diff 再翻译**
+   ```bash
+   # 查看英文文档的具体变更
+   git diff <last-sync-tag> HEAD -- documentation-website/Writerside/topics/<file>
+   ```
+   - 只翻译变更的部分，保留已有的中文翻译
+   - 对于新增内容，在现有翻译基础上追加
+   - 对于修改内容，对比差异后更新对应段落
+
+2. **判断翻译范围**
+   - 文件状态为 `[M]`（修改）：查看 diff，只翻译变更的段落
+   - 文件状态为 `[+]`（新增）：全文件翻译
+   - 文件状态为 `[-]`（删除）：删除对应的中文文件
+
+### 子代理并行翻译
+
+**使用子代理分发翻译任务以提升速度。**
+
+当需要翻译多个文件时，应使用 Task 工具并行处理：
+
+```
+# 示例：3个文件需要翻译
+# 主代理分发任务给子代理
+Task 1: 翻译 file-a.topic (diff-based)
+Task 2: 翻译 file-b.topic (full) 
+Task 3: 翻译 file-c.topic (diff-based)
+```
+
+**分发规则：**
+- 每个文件分配给独立的子代理
+- 子代理接收：英文原文路径、中文目标路径、diff 内容（如果是增量翻译）
+- 子代理返回：翻译完成的文件路径
+- 主代理汇总结果并验证
+
+**子代理任务模板：**
+```
+翻译文件：<filename>
+模式：<incremental|full>
+英文文件：<en_file_path>
+中文文件：<zh_file_path>
+Diff 内容：<git diff output>  # 仅增量模式需要
+
+翻译规则：
+- 翻译人类可读文本，保留 XML 结构和代码块
+- 为被引用的标题添加显式锚点 {#id}
+- 技术术语保持英文
+```
+
+### 翻译顺序
+
+1. 运行 `detect-changes.sh` 获取变更列表
+2. 对每个变更文件执行 `git diff` 查看具体内容
+3. 将文件分发给子代理（并行处理）
+4. 等待所有子代理完成
+5. 运行 `build.sh` 验证
+6. 运行 `commit.sh` 提交
+
 ## 翻译规则
 
 ### 基本规则
