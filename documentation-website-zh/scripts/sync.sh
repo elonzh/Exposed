@@ -12,6 +12,11 @@ cd "$PROJECT_ROOT"
 echo "=== Exposed Documentation Sync ==="
 echo ""
 
+# Step 0: Fetch and merge upstream changes
+echo "Step 0: Fetching upstream changes..."
+bash "$SCRIPT_DIR/fetch-upstream.sh"
+echo ""
+
 # Step 1: Detect changes
 echo "Step 1: Detecting changes..."
 CHANGES=$(bash "$SCRIPT_DIR/detect-changes.sh" "$@")
@@ -25,13 +30,8 @@ echo "Changes detected:"
 echo "$CHANGES" | tail -n +2
 echo ""
 
-# Step 2: Sync resources
-echo "Step 2: Syncing resources..."
-bash "$SCRIPT_DIR/sync-resources.sh"
-echo ""
-
-# Step 3: List files to translate
-echo "Step 3: Files to translate:"
+# Step 2: List files to translate
+echo "Step 2: Files to translate:"
 FILES_TO_TRANSLATE=$(echo "$CHANGES" | tail -n +2)
 for file in $FILES_TO_TRANSLATE; do
     echo "  - $file"

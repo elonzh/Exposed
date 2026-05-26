@@ -23,44 +23,69 @@ documentation-website-zh/Writerside/  # 中文文档（目标）
 
 `snippets`、`images`、`resources` 通过软链接共享，无需手动同步。
 
-## 工作流程
-
-### 1. 检测变更
+### 手动同步
 
 ```bash
+# 完整同步流程（fetch + detect + translate + build + commit）
 bash documentation-website-zh/scripts/sync.sh
-```
 
-输出需要翻译的文件列表。
+# 强制重新翻译所有文件
+bash documentation-website-zh/scripts/sync.sh --all
 
-### 2. 翻译文件
+# 仅拉取上游变更
+bash documentation-website-zh/scripts/fetch-upstream.sh
 
-对每个需要翻译的文件：
+# 仅检测变更
+bash documentation-website-zh/scripts/detect-changes.sh
 
-- 源文件：`documentation-website/Writerside/topics/<文件名>`
-- 目标文件：`documentation-website-zh/Writerside/topics/<文件名>`
-
-### 3. 构建并验证
-
-```bash
+# 仅构建
 bash documentation-website-zh/scripts/build.sh
-```
 
-构建完成后检查报告：
-
-```bash
-cat output-zh/report.json
-```
-
-### 4. 修复问题并重新构建
-
-根据报告修复问题后重新构建，直到错误数为 0 或与英文文档一致。
-
-### 5. 提交变更
-
-```bash
+# 仅提交
 bash documentation-website-zh/scripts/commit.sh
 ```
+
+## 脚本说明
+
+### fetch-upstream.sh
+
+从 `https://github.com/JetBrains/Exposed.git` 拉取最新变更并合并到当前分支。
+
+- 自动添加 `upstream` remote（如果不存在）
+- 检测上游是否有文档变更
+- 合并上游 `main` 分支
+
+### sync.sh
+
+主同步工作流，按顺序执行：
+
+1. 调用 `fetch-upstream.sh` 拉取上游变更
+2. 调用 `detect-changes.sh` 检测需要翻译的文件
+3. 输出待翻译文件列表
+
+### detect-changes.sh
+
+检测需要翻译的文件：
+
+- 对比上次同步 commit 与当前 HEAD 的差异
+- 检测英文目录中新增的文件
+- 支持 `--all` 参数强制翻译所有文件
+
+### commit.sh
+
+提交并推送变更：
+
+- 自动配置 git user（CI 环境）
+- 暂存中文文档目录的变更
+- 创建带时间戳的 commit
+- CI 环境下自动推送到 origin
+
+### build.sh
+
+构建中文文档站点：
+
+- 使用 Docker 运行 Writerside builder
+- 解压构建产物到 `site/` 目录
 
 ## 翻译规则
 

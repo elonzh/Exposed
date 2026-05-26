@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Docker
         uses: docker/setup-buildx-action@v3
@@ -36,10 +36,11 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           XIAOMI_API_KEY: ${{ secrets.XIAOMI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: xiaomi-token-plan-cn/mimo-v2.5-pro
           prompt: |
-            同步并翻译 Exposed ORM 文档
+            使用 exposed-docs-sync 技能同步并翻译 Exposed ORM 文档
 
   build-image:
     needs: sync-docs

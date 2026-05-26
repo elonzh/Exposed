@@ -1,11 +1,14 @@
 #!/bin/bash
-# commit.sh - Commit translated documentation changes
+# commit.sh - Commit and push translated documentation changes
+# Works both locally and in CI; pushes to current branch
 
 set -e
 
 ZH_DIR="documentation-website-zh/Writerside/topics"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 echo "Committing documentation changes..."
+echo "Current branch: $CURRENT_BRANCH"
 
 # Configure git if needed
 if [ -z "$(git config user.name)" ]; then
@@ -33,3 +36,20 @@ Synced at: $TIMESTAMP
 Triggered by: ${GITHUB_EVENT_NAME:-manual}"
 
 echo "Changes committed successfully."
+
+# Push if in CI environment
+if [ -n "$GITHUB_ACTIONS" ]; then
+    echo "Pushing to origin/$CURRENT_BRANCH..."
+    REMOTE_URL=$(git remote get-url origin)
+
+    if [ -n "$GITHUB_TOKEN" ]; then
+        AUTH_URL=$(echo "$REMOTE_URL" | sed "s|https://|https://x-access-token:$GITHUB_TOKEN@|")
+        git push "$AUTH_URL" HEAD:"$CURRENT_BRANCH" --quiet
+    else
+        git push origin HEAD:"$CURRENT_BRANCH" --quiet
+    fi
+
+    echo "Changes pushed successfully."
+else
+    echo "Not in CI. Run 'git push' manually."
+fi
