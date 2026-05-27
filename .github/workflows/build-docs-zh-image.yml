@@ -3,6 +3,9 @@ name: Build Docs ZH Image
 on:
   # Reusable workflow
   workflow_call:
+    secrets:
+      ALGOLIA_KEY:
+        required: false
 
   # Triggered by docs-zh-sync tag push
   push:
@@ -49,6 +52,10 @@ jobs:
         with:
           context: .
           file: documentation-website-zh/Dockerfile
+          build-args: |
+            ALGOLIA_UPLOAD_NONCE=${{ github.run_id }}
+          secrets: |
+            "ALGOLIA_KEY=${{ secrets.ALGOLIA_KEY }}"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
