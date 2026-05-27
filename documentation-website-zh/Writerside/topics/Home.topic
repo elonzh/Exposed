@@ -17,7 +17,7 @@
                summary="学习如何使用 Exposed DSL API 在 Kotlin 中创建和查询表">
                 快速开始 Exposed
             </a>
-            <a href="https://jetbrains.github.io/Exposed/api/index.html" type="server"
+            <a href="https://elonzh.cn/docs/exposed/api/index.html" type="server"
                summary="外部 API 文档">
                 API 参考
             </a>

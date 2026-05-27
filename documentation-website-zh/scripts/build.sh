@@ -18,17 +18,17 @@ echo "Building Writerside documentation..."
 docker run --rm \
     -v "$(pwd):/opt/sources" \
     -e SOURCE_DIR=/opt/sources/documentation-website-zh \
-    -e MODULE_INSTANCE=Writerside/hi_zh \
+    -e MODULE_INSTANCE=Writerside/hi \
     -e OUTPUT_DIR=/opt/sources/"$OUTPUT_DIR" \
     -e RUNNER=other \
     jetbrains/writerside-builder:2026.04.8711
 
 # Extract built documentation
 echo "Extracting documentation..."
-if [ -f "$OUTPUT_DIR/webHelpHI_ZH2-all.zip" ]; then
-    unzip -O UTF-8 "$OUTPUT_DIR/webHelpHI_ZH2-all.zip" -d "$SITE_DIR/"
+if [ -f "$OUTPUT_DIR/webHelpHI2-all.zip" ]; then
+    unzip -O UTF-8 "$OUTPUT_DIR/webHelpHI2-all.zip" -d "$SITE_DIR/"
 elif [ -f "$OUTPUT_DIR/webHelpHI_ZH2.zip" ]; then
-    unzip -O UTF-8 "$OUTPUT_DIR/webHelpHI_ZH2.zip" -d "$SITE_DIR/"
+    unzip -O UTF-8 "$OUTPUT_DIR/webHelpHI2.zip" -d "$SITE_DIR/"
 else
     echo "Error: No output ZIP file found"
     exit 1

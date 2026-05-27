@@ -3,7 +3,7 @@
 FROM jetbrains/writerside-builder:2026.04.8711 AS writerside-build
 
 ARG SOURCE_DIR=/opt/sources
-ARG MODULE_INSTANCE=Writerside/hi_zh
+ARG MODULE_INSTANCE=Writerside/hi
 ARG OUTPUT_DIR=/opt/wrs-output
 
 RUN mkdir -p ${SOURCE_DIR} ${OUTPUT_DIR}
@@ -28,10 +28,12 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy Writerside documentation
 COPY --from=writerside-build /opt/wrs-output/ /tmp/wrs-output/
 RUN cd /tmp/wrs-output && \
-    if [ -f "webHelpHI_ZH2-all.zip" ]; then \
-        unzip webHelpHI_ZH2-all.zip -d /usr/share/nginx/html/ ; \
-    elif [ -f "webHelpHI_ZH2.zip" ]; then \
-        unzip webHelpHI_ZH2.zip -d /usr/share/nginx/html/ ; \
+    if [ -f "webHelpHI2-all.zip" ]; then \
+        unzip webHelpHI2-all.zip -d /usr/share/nginx/html/ ; \
+    elif [ -f "webHelpHI2.zip" ]; then \
+        unzip webHelpHI2.zip -d /usr/share/nginx/html/ ; \
+    else \
+        echo "Error: No output ZIP file found" && exit 1 ; \
     fi && \
     rm -rf /tmp/wrs-output
 

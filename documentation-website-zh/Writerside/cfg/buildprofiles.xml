@@ -3,31 +3,30 @@
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <sitemap priority="0.35" change-frequency="monthly"/>
     <variables>
-        <web-root>https://www.jetbrains.com/help</web-root>
+        <web-root>https://elonzh.cn/docs</web-root>
         <header-logo>exposed-icon.svg</header-logo>
         <website-title>%instance% Documentation</website-title>
-        <algolia-id>MMA5Z3JT91</algolia-id>
+        <algolia-id>XT0AGICTNG</algolia-id>
         <algolia-index>prod_exposed</algolia-index>
-        <algolia-api-key>119a138f76e4c043bcbb9f0c16119094</algolia-api-key>
+        <algolia-api-key>b8727e46c66cc448719486a3e10dda38</algolia-api-key>
         <custom-favicons>
             exposed-icon.svg
         </custom-favicons>
         <analytics-head-script-file>google-search.html</analytics-head-script-file>
         <feedback-url>https://forms-service.jetbrains.com/feedback</feedback-url>
-        <feedback-enabled>true</feedback-enabled>
-        <feedback-widget>true</feedback-widget>
+        <feedback-enabled>false</feedback-enabled>
+        <feedback-widget>false</feedback-widget>
         <primary-color>iris</primary-color>
     </variables>
+
+    <footer>
+        <link href="https://www.jetbrains.com/exposed/">Exposed 官网</link>
+        <link href="https://elonzh.cn">Elonzh</link>
+    </footer>
+    
     <build-profile instance="hi">
-        <variables>
-            <noindex-content>true</noindex-content>
-            <product-web-url>https://www.jetbrains.com/exposed/</product-web-url>
-        </variables>
-    </build-profile>
-    <build-profile instance="hi_zh">
         <variables>
             <noindex-content>false</noindex-content>
         </variables>
     </build-profile>
-
 </buildprofiles>
