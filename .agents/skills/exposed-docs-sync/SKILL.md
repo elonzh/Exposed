@@ -33,7 +33,7 @@ documentation-website-zh/Writerside/  # 中文文档（目标）
 ### 手动同步
 
 ```bash
-# 完整同步流程（fetch + detect + translate + build + commit）
+# 完整同步流程（fetch + detect + translate + commit）
 bash documentation-website-zh/scripts/sync.sh
 
 # 强制重新翻译所有文件
@@ -46,7 +46,7 @@ bash documentation-website-zh/scripts/fetch-upstream.sh
 bash documentation-website-zh/scripts/detect-changes.sh
 
 # 仅构建
-bash documentation-website-zh/scripts/build.sh
+docker build -f documentation-website-zh/Dockerfile . -t exposed-docs-zh
 
 # 仅提交
 bash documentation-website-zh/scripts/commit.sh
@@ -91,13 +91,6 @@ bash documentation-website-zh/scripts/commit.sh
 - 创建带时间戳的 commit
 - 创建 git tag (`docs-zh-sync-YYYYMMDD-HHMMSS`) 标记同步点
 - CI 环境下自动推送到 origin（包含 tags）
-
-### build.sh
-
-构建中文文档站点：
-
-- 使用 Docker 运行 Writerside builder
-- 解压构建产物到 `site/` 目录
 
 ## 翻译工作流
 
@@ -167,7 +160,7 @@ Task 3: 翻译 file-c.topic
 2. 对每个变更文件执行 `git diff` 查看具体内容
 3. 将文件分发给子代理（并行处理）
 4. 等待所有子代理完成
-5. 运行 `build.sh` 验证
+5. 运行 `docker build` 验证
 6. 运行 `commit.sh` 提交
 
 ## 翻译规则

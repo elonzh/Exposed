@@ -113,5 +113,5 @@ echo ""
 
 echo "Next steps:"
 echo "1. Translate the listed files from English to Chinese"
-echo "2. Run: bash documentation-website-zh/scripts/build.sh"
+echo "2. Run: docker build -f documentation-website-zh/Dockerfile . -t exposed-docs-zh"
 echo "3. Run: bash documentation-website-zh/scripts/commit.sh"

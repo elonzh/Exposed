@@ -10,7 +10,7 @@ npm install -g opencode-ai
 if [ -S /var/run/docker.sock ]; then
     echo "Docker socket: OK"
 else
-    echo "WARNING: Docker socket not found. build.sh will not work."
+    echo "WARNING: Docker socket not found. Docker build will not work."
 fi
 
 # Check Docker command
