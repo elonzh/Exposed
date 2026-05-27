@@ -9,7 +9,8 @@ ARG OUTPUT_DIR=/opt/wrs-output
 RUN mkdir -p ${SOURCE_DIR} ${OUTPUT_DIR}
 WORKDIR ${SOURCE_DIR}
 
-COPY . ${SOURCE_DIR}/documentation-website-zh/
+COPY documentation-website-zh/ ${SOURCE_DIR}/documentation-website-zh/
+COPY documentation-website/ ${SOURCE_DIR}/documentation-website/
 
 RUN export DISPLAY=:99 && \
     Xvfb :99 & \
@@ -28,13 +29,8 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy Writerside documentation
 COPY --from=writerside-build /opt/wrs-output/ /tmp/wrs-output/
 RUN cd /tmp/wrs-output && \
-    if [ -f "webHelpHI2-all.zip" ]; then \
-        unzip webHelpHI2-all.zip -d /usr/share/nginx/html/ ; \
-    elif [ -f "webHelpHI2.zip" ]; then \
-        unzip webHelpHI2.zip -d /usr/share/nginx/html/ ; \
-    else \
-        echo "Error: No output ZIP file found" && exit 1 ; \
-    fi && \
+    unzip -o webHelpHI2.zip -d /usr/share/nginx/html/ && \
+    unzip -o webHelpImages.zip -d /usr/share/nginx/html/images/ && \
     rm -rf /tmp/wrs-output
 
 # Copy API documentation

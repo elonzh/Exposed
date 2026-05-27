@@ -2,7 +2,7 @@
 <!DOCTYPE categories
         SYSTEM "https://helpserver.labs.jb.gg/help/schemas/mvp/categories.dtd">
 <categories>
-    <category id="wrs" name="Writerside documentation" order="1"/>
-    <category id="related" name="Related topics" order="2"/>
-    <category id="learn-more" name="Learn more" order="3"/>
+    <category id="wrs" name="Writerside 文档" order="1"/>
+    <category id="related" name="相关主题" order="2"/>
+    <category id="learn-more" name="了解更多" order="3"/>
 </categories>
