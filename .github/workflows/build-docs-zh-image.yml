@@ -4,10 +4,10 @@ on:
   # Reusable workflow
   workflow_call:
 
-  # After sync-docs completes
-  workflow_run:
-    workflows: ["Sync Chinese Documentation"]
-    types: [completed]
+  # Triggered by docs-zh-sync tag push
+  push:
+    tags:
+      - 'docs-zh-sync-*'
 
   # Manual trigger
   workflow_dispatch:
@@ -15,7 +15,6 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' }}
     permissions:
       contents: read
       packages: write
@@ -46,7 +45,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha,prefix=
-            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=ref,event=tag
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
