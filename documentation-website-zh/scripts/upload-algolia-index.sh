@@ -42,6 +42,35 @@ if [ ! -d "${index_dir}" ]; then
     exit 1
 fi
 
+algolia_api_base="https://${algolia_app_name}.algolia.net"
+
+algolia_request() {
+    method="$1"
+    path="$2"
+    body="$3"
+
+    curl --fail --silent --show-error \
+        --request "${method}" \
+        --url "${algolia_api_base}${path}" \
+        --header 'accept: application/json' \
+        --header 'content-type: application/json' \
+        --header "x-algolia-api-key: ${algolia_key}" \
+        --header "x-algolia-application-id: ${algolia_app_name}" \
+        --data "${body}"
+}
+
+echo "Ensuring Algolia facets for product/version"
+algolia_request PUT \
+    "/1/indexes/${algolia_index_name}/settings" \
+    '{"attributesForFaceting":["searchable(product)","searchable(version)"]}' \
+    >/dev/null
+
+echo "Deleting existing Algolia records for ${config_product}@${config_version}"
+algolia_request POST \
+    "/1/indexes/${algolia_index_name}/deleteByQuery" \
+    "{\"filters\":\"product:${config_product} AND version:${config_version}\"}" \
+    >/dev/null
+
 echo "Uploading Algolia indexes for ${config_product}@${config_version}"
 env "algolia-key=${algolia_key}" java -jar /opt/builder/help-publication-agent.jar \
     update-index \
