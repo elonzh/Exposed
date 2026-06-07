@@ -24,7 +24,7 @@ echo ""
 echo "Step 1: Detecting changes..."
 CHANGES=$(bash "$SCRIPT_DIR/detect-changes.sh" "$@" 2>&1)
 
-if [ "$CHANGES" = "NO_CHANGES" ]; then
+if echo "$CHANGES" | grep -q "^NO_CHANGES$"; then
     echo "No changes detected. Nothing to do."
     exit 0
 fi
@@ -38,6 +38,10 @@ NEW_FILES=""
 DELETED_FILES=""
 
 while IFS= read -r line; do
+    # Skip lines that are not file listings
+    [[ "$line" =~ ^"Last sync tag:" ]] && continue
+    [[ "$line" =~ ^"SKIP" ]] && continue
+    
     case "$line" in
         MODIFIED:*)
             file="${line#MODIFIED:}"
@@ -54,7 +58,7 @@ while IFS= read -r line; do
             DELETED_FILES="$DELETED_FILES $file"
             echo "  [-] $file (deleted in upstream)"
             ;;
-        CHANGED|ALL|FIRST_SYNC)
+        CHANGED|ALL|FIRST_SYNC|NO_CHANGES)
             echo "  Mode: $line"
             ;;
         *)
