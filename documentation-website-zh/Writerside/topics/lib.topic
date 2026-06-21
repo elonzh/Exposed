@@ -7,7 +7,7 @@
 
     <snippet id="code_example">
         <p>
-            <b>Code example</b>:
+            <b>代码示例</b>：
             <a href="https://github.com/JetBrains/Exposed/tree/main/documentation-website/Writerside/snippets/%example_name%">
                 %example_name%
             </a>
@@ -16,56 +16,55 @@
 
     <snippet id="intellij_idea_restart_application">
         <p>
-            In IntelliJ IDEA, click the rerun button (<img src="intellij_idea_rerun_icon.svg"
+            在 IntelliJ IDEA 中，点击重新运行按钮（<img src="intellij_idea_rerun_icon.svg"
                                                            style="inline" height="16" width="16"
-                                                           alt="intelliJ IDEA rerun icon"/>) to restart the
-            application.
+                                                           alt="intelliJ IDEA rerun icon"/>）以重启应用程序。
         </p>
     </snippet>
 
     <snippet id="intellij_idea_start_application">
-        <p>In IntelliJ IDEA, click on the run button
-            (<img src="intellij_idea_gutter_icon.svg"
+        <p>在 IntelliJ IDEA 中，点击运行按钮
+            （<img src="intellij_idea_gutter_icon.svg"
                   style="inline" height="16" width="16"
-                  alt="intelliJ IDEA run icon"/>)
-            to start the application.</p>
+                  alt="intelliJ IDEA run icon"/>）
+            以启动应用程序。</p>
     </snippet>
 
     <snippet id="intellij_idea_load_gradle_changes">
-        <p>In intelliJ IDEA, click on the notification Gradle icon
-            (<img alt="intelliJ IDEA gradle icon"
-                  src="intellij_idea_gradle_icon.svg" width="16" height="26"/>)
-            on the right side of the editor to load Gradle changes.</p>
+        <p>在 IntelliJ IDEA 中，点击编辑器右侧的通知 Gradle 图标
+            （<img alt="intelliJ IDEA gradle icon"
+                  src="intellij_idea_gradle_icon.svg" width="16" height="26"/>）
+            以加载 Gradle 变更。</p>
     </snippet>
 
     <snippet id="r2dbc-not-supported">
         <p>
-            <b>R2DBC</b>: ❌ Not supported
+            <b>R2DBC</b>：❌ 不支持
         </p>
     </snippet>
 
     <snippet id="r2dbc-supported">
         <p>
-            <b>R2DBC</b>: ✅ Supported
+            <b>R2DBC</b>：✅ 支持
         </p>
     </snippet>
 
 
     <snippet id="r2dbc-limited-support">
         <p>
-            <b>R2DBC</b>: ⚠️ Limited
+            <b>R2DBC</b>：⚠️ 有限支持
         </p>
     </snippet>
 
     <snippet id="r2dbc-driver-specific">
         <p>
-            <b>R2DBC</b>: ⚠️️ Driver-specific
+            <b>R2DBC</b>：⚠️️ 驱动特定
         </p>
     </snippet>
 
     <snippet id="jdbc-supported">
         <p>
-            <b>JDBC</b>: ✅ Supported
+            <b>JDBC</b>：✅ 支持
         </p>
     </snippet>
 
