@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.exposed.gradle.configureDetekt
 import org.jetbrains.exposed.gradle.configureMavenCentralMetadata
 import org.jetbrains.exposed.gradle.testDb
@@ -24,7 +25,9 @@ dependencies {
     dokka(projects.exposed.exposedCore)
     dokka(projects.exposed.exposedCrypt)
     dokka(projects.exposed.exposedDao)
+    dokka(projects.exposed.exposedPluginCore)
     dokka(projects.exposed.exposedGradlePlugin)
+    dokka(projects.exposed.exposedMavenPlugin)
     dokka(projects.exposed.exposedJavaTime)
     dokka(projects.exposed.exposedJdbc)
     dokka(projects.exposed.exposedJodatime)
@@ -44,7 +47,9 @@ dependencies {
     // Include all source modules for coverage aggregation
     kover(project(":exposed-core"))
     kover(project(":exposed-dao"))
+    kover(project(":exposed-plugin-core"))
     kover(project(":exposed-gradle-plugin"))
+    kover(project(":exposed-maven-plugin"))
     kover(project(":exposed-jodatime"))
     kover(project(":exposed-java-time"))
     kover(project(":spring-transaction"))
@@ -91,7 +96,9 @@ allprojects {
 }
 
 apiValidation {
-    ignoredProjects.addAll(listOf("exposed-tests", "exposed-bom", "exposed-r2dbc-tests", "exposed-jdbc-r2dbc-tests"))
+    ignoredProjects.addAll(
+        listOf("exposed-tests", "exposed-bom", "exposed-r2dbc-tests", "exposed-jdbc-r2dbc-tests", "exposed-version-catalog")
+    )
 }
 
 subprojects {
@@ -100,10 +107,15 @@ subprojects {
     dependencies {
         detektPlugins(rootProject.libs.detekt.formatting)
     }
+
+    tasks.withType<Detekt>().configureEach {
+        // Detekt's bundled parser can't handle context parameter syntax (context(_: X)).
+        exclude("**/MavenProjectGeneration.kt")
+    }
 }
 
 subprojects {
-    if (name == "exposed-bom") return@subprojects
+    if (name == "exposed-bom" || name == "exposed-version-catalog") return@subprojects
 
     apply(plugin = rootProject.libs.plugins.jvm.get().pluginId)
     apply(plugin = rootProject.libs.plugins.kover.get().pluginId)

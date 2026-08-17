@@ -18,14 +18,16 @@
 Managing database schema changes is a critical part of application development. Exposed supports two approaches to
 schema migrations:
 
-* The [Exposed Gradle plugin](Exposed-gradle-plugin.md) provides a higher-level workflow for generating migration scripts by comparing your Exposed
-  table definitions with an existing database schema.
+* The [Exposed Gradle plugin](Exposed-gradle-plugin.md) and the [Exposed Maven plugin](exposed-maven-plugin.md) provide
+  higher-level workflows for generating migration scripts by comparing your Exposed table definitions with an existing
+  database schema.
 * The `SchemaUtils` and `MigrationUtils` APIs provide lower-level building blocks for custom migration and schema validation workflows that can be used directly in
   Kotlin code.
 
 > This topic describes the migration APIs provided by `SchemaUtils` and `MigrationUtils`.
 > 
-> For a Gradle-based workflow that generates migration scripts automatically, see [Exposed Gradle plugin](Exposed-gradle-plugin.md).
+> For build-tool-driven workflows that generate migration scripts automatically, see the
+> [Exposed Gradle plugin](Exposed-gradle-plugin.md) or the [Exposed Maven plugin](exposed-maven-plugin.md).
 > 
 {style="tip"}
 
@@ -320,7 +322,8 @@ Any detected changes to table and column constraints generally result in the gen
 The type of change that generates these migration statements depends on the type of constraint:
 
 - [`ForeignKeyConstraint`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-foreign-key-constraint/index.html) detects mismatches in name, update rule, or delete rule.
-- [`Index`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-index/index.html) detects mismatches in name, uniqueness, or columns involved. Differences in index type, index function, or filter conditions will not be detected.
+- [`Index`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-index/index.html) detects mismatches in uniqueness or columns involved. Differences in index type, index function, or filter conditions will not be detected.
+  By default, a mismatch in index name alone is also detected, but it is only logged (if logs are enabled during migration script generation).
 - [`CheckConstraint`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-check-constraint/index.html) detects mismatches in name only. Differences in the boolean expression or condition used by this constraint will not be detected.
 
 ### Column change detection
@@ -378,9 +381,8 @@ method instead, the string value will be properly compared with the comment retr
 
 ## Feature requests
 
-### Maven and Liquibase integration
+### Liquibase integration
 
-Exposed does not currently offer a Maven plugin or Liquibase integration — share your interest to help shape future support:
+Exposed does not currently offer a Liquibase integration — share your interest to help shape future support:
 
-- [Upvote or comment on the Maven plugin feature request](https://youtrack.jetbrains.com/issue/EXPOSED-758/Create-a-migration-plugin-for-Maven-build-tool)
 - [Join the discussion for Liquibase extension support](https://youtrack.jetbrains.com/issue/EXPOSED-757/Allow-use-of-migration-plugin-with-Liquibase)

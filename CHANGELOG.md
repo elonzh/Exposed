@@ -1,3 +1,64 @@
+# 1.4.0
+
+Infrastructure:
+* log4j2 2.26.1
+* postgresql-jdbc 42.7.13
+* flyway 13.1.0
+* kover 0.9.9
+* r2dbc-mysql 1.4.3
+* sqlite-jdbc 3.53.2.1
+* SpringFramework 7.0.8
+* SpringBoot 4.1.0
+* joda-time 2.14.3
+* ojdbc11 23.26.3.0.0
+
+Features:
+* feat: EXPOSED-1032 Add query timeout as a global configuration  by @bog-walk in https://github.com/JetBrains/Exposed/pull/2834
+* feat: EXPOSED-758 Add Exposed Maven plugin for migration script generation by @frederikpietzko in https://github.com/JetBrains/Exposed/pull/2817
+* feat: Add `exposed-version-catalog` for managing dependencies by @e5l in https://github.com/JetBrains/Exposed/pull/2856
+
+Bug fixes:
+* fix: Maven Plugin Config Mapping by @frederikpietzko in https://github.com/JetBrains/Exposed/pull/2855
+* fix: Prevent NoSuchElementException when removing the only batch from BatchInsertStatement by @cfcromn in https://github.com/JetBrains/Exposed/pull/2859
+* fix: EXPOSED-1028 Return defensive copy from ExposedSpringTransactionAttributeSource by @yurano in https://github.com/JetBrains/Exposed/pull/2812
+* fix: Use thread-safe lazy initialization for JDBC Database capability flags by @Develop-KIM in https://github.com/JetBrains/Exposed/pull/2853
+* fix: Fix version catalog docs and versions by @e5l in https://github.com/JetBrains/Exposed/pull/2874
+
+Docs:
+* docs: Fix documentation typos by @Martonveghcode in https://github.com/JetBrains/Exposed/pull/2850
+* docs: Fix dependency issue of mysql-connector-j by @Abdulrahman-AL-Sabagh in https://github.com/JetBrains/Exposed/pull/2849
+* docs: EXPOSED-976 Add mentions and links to the Exposed plugin  by @vnikolova in https://github.com/JetBrains/Exposed/pull/2844
+* docs: Add `route` to import statements in ProjectRoutes configuration for exposed-ktor-r2dbc sample by @VGoncharova in https://github.com/JetBrains/Exposed/pull/2864
+* docs: Add sample springboot3-exposed-r2dbc by @myfaverate in https://github.com/JetBrains/Exposed/pull/2511
+* docs: Edit index migrations docs to specify what changes trigger SQL generation by @bog-walk in https://github.com/JetBrains/Exposed/pull/2871
+* docs: Add documentation to website for Exposed Maven plugin by @frederikpietzko in https://github.com/JetBrains/Exposed/pull/2838
+* docs: EXPOSED-1037 Update the date and time types topic by @vnikolova in https://github.com/JetBrains/Exposed/pull/2863
+
+# 1.3.1
+
+Infrastructure:
+* Flyway 12.10.0
+* sqlite-jdbc 3.53.2.0
+* oracle-ojdbc11 23.26.2.0.0
+* Spring Framework(6) 6.2.19
+* r2dbc-mssql 1.0.5.RELEASE
+* r2dbc-postgresql 1.1.2.RELEASE
+* postgresql-jdbc 42.7.12
+
+Bug fixes:
+* fix: EXPOSED-1030 Nullable Strings are not handled by the PrimitiveTypeMapper by @renatomrcosta in https://github.com/JetBrains/Exposed/pull/2814
+* fix: EXPOSED-995 Spring Boot starter native runtime failure missing reflection hint for some column types by @bog-walk in https://github.com/JetBrains/Exposed/pull/2833
+* fix: Apply inProperCase() to CHECK constraint names by @rasharab in https://github.com/JetBrains/Exposed/pull/2826
+* fix: EXPOSED-644 Can't use Instant.DISTANT_FUTURE as default value by @bog-walk in https://github.com/JetBrains/Exposed/pull/2832
+
+Performance:
+* perf: Replace ResultRow LinkedHashMap cache with a single array by @inemtsev in https://github.com/JetBrains/Exposed/pull/2824
+
+Docs:
+* docs: EXPOSED-1031 Strengthened KDoc for InsertStatement and BatchInsertStatement by @kchung1995 in https://github.com/JetBrains/Exposed/pull/2816
+* docs: Add exposed-gradle-plugin sample by @e5l in https://github.com/JetBrains/Exposed/pull/2823
+* docs: EXPOSED-1035 Fix UuidTable KDoc parameter mismatch by @wsdf25867 in https://github.com/JetBrains/Exposed/pull/2830
+
 # 1.3.0
 
 Features:
@@ -24,7 +85,7 @@ Docs:
 Performance:
 * perf: R2DBC - Performance issue in R2dbcRegistryTypeMappingImpl by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2788
 
-  Infrastructure:
+Infrastructure:
 * kotlin 2.3.20
 * kotlinx-serialization 1.11.0
 * kotlinCoroutines 1.11.0
@@ -321,7 +382,7 @@ Docs:
 * docs: Update KDocs @sample to use correct v1 package paths by @bog-walk in https://github.com/JetBrains/Exposed/pull/2541
 
 Bug fixes:
-* fix: EXPOSED-827 forUpdate() query method doesn't add actual `FOR UDPATE` modifier by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2548
+* fix: EXPOSED-827 forUpdate() query method doesn't add actual `FOR UPDATE` modifier by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2548
 
 # 1.0.0-beta-3
 
@@ -694,7 +755,7 @@ Bug fixes:
 * fix: EXPOSED-474 Unexpected value of type when using a ColumnTransfor… by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2191
 * fix: EXPOSED-472 Alias IdTable fails with isNull and eq ops by @bog-walk in https://github.com/JetBrains/Exposed/pull/2189
 * fix: EXPOSED-467 Decimal type precision and scale not checked by SchemaUtils by @bog-walk in https://github.com/JetBrains/Exposed/pull/2192
-* EXPOSED-203 Lightweight DAO insert with encryptedVarchar attemtps to … by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2194
+* EXPOSED-203 Lightweight DAO insert with encryptedVarchar attempts to … by @obabichevjb in https://github.com/JetBrains/Exposed/pull/2194
 * fix: EXPOSED-481 Bug with batch-flushing of CompositeID entities by @bystam in https://github.com/JetBrains/Exposed/pull/2196
 * fix: EXPOSED-492 Eq/Neq op with partial CompositeID unwrapped value fails by @bog-walk in https://github.com/JetBrains/Exposed/pull/2205
 * fix: EXPOSED-485 ClassCastException when eager loading referrersOn with uuid().references() by @bog-walk in https://github.com/JetBrains/Exposed/pull/2198
@@ -1177,7 +1238,7 @@ Features:
 * feat: EXPOSED-68 Add more json/json(b) column functions by @bog-walk in https://github.com/JetBrains/Exposed/pull/1770
 * #623 Add support of window functions in Exposed DSL by @Legohuman in https://github.com/JetBrains/Exposed/pull/1651
 * feat: EXPOSED-89 Support functions in Create Index by @bog-walk in https://github.com/JetBrains/Exposed/pull/1788
-* feat: Add spring mutli container support by @FullOfOrange in https://github.com/JetBrains/Exposed/pull/1781
+* feat: Add spring multi container support by @FullOfOrange in https://github.com/JetBrains/Exposed/pull/1781
 * feat: EXPOSED-43 Add support for timestamp with time zone by @joc-a in https://github.com/JetBrains/Exposed/pull/1787
 
 Bug fixes:
@@ -1254,7 +1315,7 @@ Feature:
       Lambdas previously using an implicit `it` reference from an outer scope will also need to introduce an explicit name to access that binding.
 * New `mediumText` and `largeText` columns were introduced by [Alex Shubert](https://github.com/lure) to allow use more suitable data types for databases where they are supported.
 * `ForUpdateOption` (like `ForUpdateOption.PostgreSQL.ForKeyShare`) added for more flexible management of locks in your `SELECT` queries. You can set it as a parameter via `Query.forUpdate` function. Another kudos goes to [Alex Shubert](https://github.com/lure)
-* Preserve a colection type for `Iterable.with()` function 
+* Preserve a collection type for `Iterable.with()` function
 * `LazySizedCollection` can be checked for loaded data with `LazySizedCollection.isLoaded()`. Added by [unbearables](https://github.com/unbearables)
 
 Bug Fixes:
@@ -1307,7 +1368,7 @@ Bug Fixes:
 * Argument value error acquires when `REPLACE` used with expressions under MySQL. Founded and fixed by [Tiscs](https://github.com/Tiscs)
 * `EntityClass#wramUpReferences` doesn't store the cached values. Resolved by [Joddev](https://github.com/Joddev)
 * Creating tables with composite primary key and defined schema doesn't work. Fixed by [davidwheeler123](https://github.com/davidwheeler123)
-* Eager loading of Parent-Child relations doen't work ([#1363](https://github.com/JetBrains/Exposed/issues/1363))
+* Eager loading of Parent-Child relations doesn't work ([#1363](https://github.com/JetBrains/Exposed/issues/1363))
 * Possible StackOverflowError when processing entities hooks which executes flush
 
 # 0.38.2
@@ -1685,7 +1746,7 @@ Bug fixes:
 # 0.28.1
 Breaking Changes:
 * `referrersOn`/`optionalReferrersOn` is now have `cache=true` by default [1046](https://github.com/JetBrains/Exposed/issues/1046). 
-  It should help to prevent excessive queries when reading referenced values withing the same transaction but may require more memory to store the cached values.
+  It should help to prevent excessive queries when reading referenced values within the same transaction but may require more memory to store the cached values.
 * Default isolation level for PostgreSQL now set to `READ_COMMITTED`. PR by [uryyyyyyy](https://github.com/uryyyyyyy)  
 * [Oracle] Binary column type without length prohibited in favour to blob
 
@@ -1889,7 +1950,7 @@ Features:
 * New way to define primary keys on tables were implemented by [hfazai](https://github.com/hfazai) to support custom primary key constraint keys. 
 If have to use `override val primaryKey: PrimaryKey?` on your table if you want to define a custom name. 
 For all users of predefined `IntIdTable`/`LongIdTable`/`UUIDTable` nothing changed. 
-Old `Column.primaryKey` function was depricated and will be removed in the future releases.
+Old `Column.primaryKey` function was deprecated and will be removed in the future releases.
 * `java.time.Instant` supported with `timestamp` column type (`exposed-java-time` module only) ([#724](https://github.com/JetBrains/Exposed/issues/724)). Many thanks to [Lukáš Křečan](https://github.com/lukas-krecan).
 * Support for unsized binary columns (Oracle and PostgreSQL dialects) ([#716](https://github.com/JetBrains/Exposed/issues/716)). Another great PR from [hfazai](https://github.com/hfazai).
 * A unique identifier for `Transaction` instance introduced and supported in EntityHooks/EntityEvents by [mpe85](https://github.com/mpe85).
@@ -2280,7 +2341,7 @@ Bug fixes:
 # 0.10.3
 Features:
 * Floating point columns
-* Check constraint functionallity (kudos to @SackCastellon)
+* Check constraint functionality (kudos to @SackCastellon)
 * Possibility to provide custom names for contraints and indexes (thanks to @mduesterhoeft)
 * Added support to delete with limit and offset (thanks  @Mon_chi for initial PR)
 * Full SQL will be now logged on any SQLException ([#288](https://github.com/JetBrains/Exposed/issues/288) [Suggestion] Log the SQL query when an exception is thrown)

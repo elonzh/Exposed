@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "org.jetbrains.exposed.plugin"
-version = "1.3.0"
+version = "1.4.0"
 description = "Exposed Gradle plugin"
 
 repositories {
@@ -32,6 +32,7 @@ dependencies {
 
     implementation(project(":exposed-jdbc"))
     implementation(project(":exposed-migration-jdbc"))
+    implementation(project(":exposed-plugin-core"))
 
     implementation(libs.kotlin.stdlib)
 
