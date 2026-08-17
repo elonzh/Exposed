@@ -27,7 +27,7 @@ val config = HikariConfig().apply {
 }
 
 // Gradle
-implementation "mysql:mysql-connector-java:8.0.33"
+implementation "mysql:mysql-connector-j:8.0.33"
 implementation "com.zaxxer:HikariCP:4.0.3"
 ```
 然后使用此配置类实例化一个 `HikariDataSource` 并将其提供给 `Database.connect()`：

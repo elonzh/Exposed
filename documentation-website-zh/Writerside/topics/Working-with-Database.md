@@ -164,7 +164,7 @@ Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-1;", "org.h2.Driver")
 <tabs group="connectivity">
     <tab id="jdbc-mysql" title="JDBC" group-key="jdbc">
         <code-block lang="kotlin">
-            implementation("mysql:mysql-connector-java:%mysql%")
+            implementation("mysql:mysql-connector-j:%mysql%")
         </code-block>
     </tab>
     <tab id="r2dbc-mysql" title="R2DBC" group-key="r2dbc">

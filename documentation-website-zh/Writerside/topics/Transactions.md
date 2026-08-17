@@ -319,9 +319,21 @@ transaction(db = db) {
 
 ### `queryTimeout`
 
-使用 `queryTimeout` 设置在超时之前等待块中每个语句执行的秒数：
+使用 `queryTimeout` 设置在超时之前等待块中每个语句执行的秒数。
+
+如果未设置，则将使用
+[`DatabaseConfig`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-database-config/index.html)
+中提供的任何默认值：
 
 ```kotlin
+val db = Database.connect(
+    datasource = datasource,
+    databaseConfig = DatabaseConfig {
+        defaultQueryTimeout = 1
+    }
+)
+
+// 事务块中设置的属性覆盖默认的 DatabaseConfig
 transaction {
     queryTimeout = 3
     try {

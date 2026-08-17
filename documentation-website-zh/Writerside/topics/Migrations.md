@@ -17,12 +17,14 @@
 
 管理数据库模式变更 是应用程序开发的关键部分。Exposed 支持两种模式迁移方法：
 
-* [Exposed Gradle 插件](Exposed-gradle-plugin.md)通过比较 Exposed 表定义与现有数据库模式来提供更高级别的迁移脚本生成工作流。
+* [Exposed Gradle 插件](Exposed-gradle-plugin.md)和 [Exposed Maven 插件](exposed-maven-plugin.md)通过比较 Exposed 表定义与现有数据库模式，
+  提供更高级别的迁移脚本生成工作流。
 * `SchemaUtils` 和 `MigrationUtils` API 提供了较低级别的构建块，用于可在 Kotlin 代码中直接使用的自定义迁移和模式验证工作流。
 
 > 本主题描述了 `SchemaUtils` 和 `MigrationUtils` 提供的迁移 API。
 > 
-> 有关自动生成迁移脚本的基于 Gradle 的工作流，请参见 [Exposed Gradle 插件](Exposed-gradle-plugin.md)。
+> 有关自动生成迁移脚本、由构建工具驱动的工作流，请参见
+> [Exposed Gradle 插件](Exposed-gradle-plugin.md)或 [Exposed Maven 插件](exposed-maven-plugin.md)。
 > 
 {style="tip"}
 
@@ -280,7 +282,8 @@ SQLite 对 `ALTER TABLE ADD COLUMN` 语句有严格限制。例如，在某些�
 检测到的表和列约束的任何变更通常会导致生成 `DROP` 和 `CREATE` / `ALTER` 语句对。生成这些迁移语句的变更类型取决于约束类型：
 
 - [`ForeignKeyConstraint`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-foreign-key-constraint/index.html) 检测名称、更新规则或删除规则的不匹配。
-- [`Index`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-index/index.html) 检测名称、唯一性或涉及列的不匹配。不会检测索引类型、索引函数或过滤条件的差异。
+- [`Index`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-index/index.html) 检测唯一性或涉及列的不匹配。不会检测索引类型、索引函数或过滤条件的差异。
+  默认情况下，也会检测仅索引名称不匹配的情况，但只会将其记录到日志中（前提是在生成迁移脚本时启用了日志）。
 - [`CheckConstraint`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-check-constraint/index.html) 仅检测名称的不匹配。不会检测此约束使用的布尔表达式或条件的差异。
 
 ### 列变更检测
@@ -328,9 +331,8 @@ SQLite 对 `ALTER TABLE ADD COLUMN` 语句有严格限制。例如，在某些�
 
 ## 功能请求
 
-### Maven 和 Liquibase 集成
+### Liquibase 集成
 
-Exposed 目前不提供 Maven 插件或 Liquibase 集成——请分享你的兴趣以帮助塑造未来的支持：
+Exposed 目前不提供 Liquibase 集成——请分享你的兴趣以帮助塑造未来的支持：
 
-- [为 Maven 插件功能请求投票或评论](https://youtrack.jetbrains.com/issue/EXPOSED-758/Create-a-migration-plugin-for-Maven-build-tool)
 - [加入 Liquibase 扩展支持的讨论](https://youtrack.jetbrains.com/issue/EXPOSED-757/Allow-use-of-migration-plugin-with-Liquibase)

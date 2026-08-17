@@ -30,7 +30,7 @@
                 基本类型
             </a>
             、
-            <a href="Date-and-time-types.topic">日期和时间</a>
+            <a href="date-and-time-types.md">日期和时间</a>
             、
             <a href="Array-types.topic">数组</a>
             、
@@ -63,6 +63,12 @@
                 <include from="DAO-Table-Types.topic" element-id="StarWarsFilmsTable-dao-sql" />
             </tab>
         </tabs>
+        <note>
+            在 IntelliJ IDEA Ultimate 中，你可以使用
+            <a href="https://plugins.jetbrains.com/plugin/24367-exposed">Exposed 插件</a>根据现有数据库模式生成
+            表定义。有关更多信息，请参阅
+            <a href="https://www.jetbrains.com/help/idea/exposed.html">Exposed 插件文档</a>。
+        </note>
         <chapter title="配置自定义表名" id="name-from-object">
             <p>
                 默认情况下，Exposed 从完整的类名生成表名。

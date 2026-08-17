@@ -78,6 +78,91 @@ Exposed 应用程序至少需要 [核心模块](#core-module) 和一个
   </tab>
 </tabs>
 
+## 使用版本目录
+
+如果您使用 [Gradle 版本目录（version catalog）](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:importing-published-catalog)，
+可以导入已发布的 `exposed-version-catalog`，而无需手动逐一列出 Exposed 依赖坐标。
+该版本目录为每个 Exposed 模块提供类型安全的访问器，并确保它们的版本保持一致。
+
+在 `settings.gradle.kts` 中导入版本目录：
+
+<tabs>
+  <tab title="Kotlin Gradle">
+    <code-block lang="kotlin">
+    dependencyResolutionManagement {
+        repositories {
+            mavenCentral()
+        }
+        versionCatalogs {
+            create("exposedLibs") {
+                from("org.jetbrains.exposed:exposed-version-catalog:%exposed_version%")
+            }
+        }
+    }
+    </code-block>
+  </tab>
+  <tab title="Groovy Gradle">
+    <code-block lang="groovy">
+    dependencyResolutionManagement {
+        repositories {
+            mavenCentral()
+        }
+        versionCatalogs {
+            create("exposedLibs") {
+                from("org.jetbrains.exposed:exposed-version-catalog:%exposed_version%")
+            }
+        }
+    }
+    </code-block>
+  </tab>
+</tabs>
+
+然后在 Gradle 构建脚本中通过版本目录访问器引用这些模块：
+
+<tabs>
+  <tab title="Kotlin Gradle">
+    <code-block lang="kotlin">
+    dependencies {
+        implementation(exposedLibs.core)
+        implementation(exposedLibs.jdbc)
+        implementation(exposedLibs.dao) // Optional
+    }
+    </code-block>
+  </tab>
+  <tab title="Groovy Gradle">
+    <code-block lang="groovy">
+    dependencies {
+        implementation exposedLibs.core
+        implementation exposedLibs.jdbc
+        implementation exposedLibs.dao // Optional
+    }
+    </code-block>
+  </tab>
+</tabs>
+
+每个模块的访问器是移除模块名中的 `exposed-` 前缀，并将所有连字符转换为嵌套访问器后得到的。
+例如，`exposed-kotlin-datetime` 会变为 `exposedLibs.kotlin.datetime`。
+
+> {style="note"}
+
+> 版本目录是 Gradle 的一项功能。Maven 用户应像上文所示直接声明依赖。
+> {style="note"}
+
+所有模块共用同一个 `exposed` 版本，您可以在一处为整个版本目录覆盖该版本：
+
+<code-block lang="kotlin">
+versionCatalogs {
+    create("exposedLibs") {
+        from("org.jetbrains.exposed:exposed-version-catalog:%exposed_version%")
+        version("exposed", "%exposed_version%")
+    }
+}
+</code-block>
+
+> 版本目录以 `exposedLibs` 而非 `exposed` 为名称导入，以避免与
+> [](Exposed-gradle-plugin.md) 冲突；该插件会注册一个名为 `exposed` 的项目扩展。如果您不应用该
+> 插件，可以将版本目录命名为 `exposed`，并使用 `exposed.core` 等访问器。
+
 ## 模块
 
 Exposed 由多个模块组成，分为以下几类：

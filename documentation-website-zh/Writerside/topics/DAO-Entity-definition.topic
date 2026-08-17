@@ -32,6 +32,12 @@
                 <include from="DAO-Table-Types.topic" element-id="StarWarsFilmsTable-dao-code-block"/>
             </tab>
         </tabs>
+        <note>
+            在 IntelliJ IDEA Ultimate 中，您可以使用
+            <a href="https://plugins.jetbrains.com/plugin/24367-exposed">Exposed 插件</a>根据表定义生成实体。
+            有关更多信息，请参阅
+            <a href="https://www.jetbrains.com/help/idea/exposed.html">Exposed 插件文档</a>。
+        </note>
         <chapter id="entity-type" title="实体类型">
             <p>
                 实体类型决定了 <code>Entity</code> 类如何与表的主键交互。

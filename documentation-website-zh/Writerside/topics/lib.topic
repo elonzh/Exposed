@@ -99,4 +99,57 @@
             </tab>
         </tabs>
     </snippet>
+
+    <snippet id="date-time-components">
+        <deflist type="medium">
+            <def id="%date_time_api_module%-year">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/year.html">
+                        <code>.year()</code>
+                    </a>
+                </title>
+                返回以 <code>Int</code> 表示的年份。
+            </def>
+            <def id="%date_time_api_module%-month">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/month.html">
+                        <code>.month()</code>
+                    </a>
+                </title>
+                返回一年中的月份（<code>1</code>–<code>12</code>）。
+            </def>
+            <def id="%date_time_api_module%-day">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/day.html">
+                        <code>.day()</code>
+                    </a>
+                </title>
+                返回一个月中的日期（<code>1</code>–<code>31</code>）。
+            </def>
+            <def id="%date_time_api_module%-hour">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/hour.html">
+                        <code>.hour()</code>
+                    </a>
+                </title>
+                返回一天中的小时数（<code>0</code>–<code>23</code>）。
+            </def>
+            <def id="%date_time_api_module%-minute">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/minute.html">
+                        <code>.minute()</code>
+                    </a>
+                </title>
+                返回一小时中的分钟数（<code>0</code>–<code>59</code>）。
+            </def>
+            <def id="%date_time_api_module%-second">
+                <title>
+                    <a href="https://jetbrains.github.io/Exposed/api/%date_time_api_module%/%date_time_api_package%/second.html">
+                        <code>.second()</code>
+                    </a>
+                </title>
+                返回一分钟中的秒数（<code>0</code>–<code>59</code>）。
+            </def>
+        </deflist>
+    </snippet>
 </topic>

@@ -38,22 +38,23 @@
             </li>
             <li><a href="https://www.oracle.com/java/technologies/downloads/">Java 开发工具包（JDK）</a>，版本 8 或更高。</li>
             <li>集成开发环境（IDE），例如 <a href="https://www.jetbrains.com/idea/">
-                IntelliJ IDEA Ultimate
-            </a>。  <p>
+                IntelliJ IDEA
+            </a>。
+                <note>
                 我们建议你安装
-                <a href="https://www.jetbrains.com/idea/">
+                <a href="https://www.jetbrains.com/idea/buy/">
                     IntelliJ IDEA Ultimate
                 </a>
                 ，它内置了
                 <a href="https://www.jetbrains.com/pages/intellij-idea-databases/">
                     数据库工具
                 </a>
-                和
-                <a href="https://plugins.jetbrains.com/plugin/24367-exposed">
+                并支持
+                <a href="https://www.jetbrains.com/help/idea/exposed.html">
                     Exposed 插件
                 </a>
-                ，提供代码补全和检查功能。不过，你也可以使用其他你喜欢的 IDE。
-            </p></li>
+                。Exposed 插件提供代码补全和检查功能，还可让你根据现有模式生成表和实体。
+            </note></li>
         </list>
 
     </chapter>
