@@ -235,7 +235,7 @@ SQLite 读取 `jsonb()` 列时会应用此函数。
 ```
 {src="exposed-data-types/src/main/kotlin/org/example/examples/JSONandJSONBExamples.kt" include-lines="106-114"}
 
-### 检查 JSON 是否包含表达式
+### 检查 JSON 是否包含表达式 {id="check-if-json-contains-an-expression"}
 
 要检查 JSON 表达式是否包含某个值，请使用
 [`.contains()`](https://jetbrains.github.io/Exposed/api/exposed-json/org.jetbrains.exposed.v1.json/contains.html)
