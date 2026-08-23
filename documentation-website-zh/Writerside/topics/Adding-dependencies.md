@@ -206,7 +206,7 @@ Exposed 提供了一个可选的数据库访问模块，它建立在 `exposed-co
 
 | 模块                         | 功能                                                                                                                                                                        |
 |--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `exposed-crypt`                | 提供额外的列类型，用于在数据库中存储加密数据并在客户端进行编码/解码                                                                |
+| `exposed-crypt`                | 提供额外的列类型，用于在数据库中存储加密数据、在客户端进行编码/解码，以及存储密码等单向哈希数据                                      |
 | `exposed-java-time`            | 基于 [Java 8 Time API](https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html) 的日期时间扩展                                                   |
 | `exposed-jodatime`             | 基于 [Joda-Time](https://www.joda.org/joda-time/) 库的日期时间扩展                                                                                          |
 | `exposed-json`                 | JSON 和 JSONB 数据类型扩展                                                                                                                                             |

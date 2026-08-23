@@ -12,7 +12,7 @@ Exposed 是一个基于 Kotlin 的 SQL 库，结合了用于构建查询的 DSL�
 
 ### 支持哪些数据类型？
 
-Exposed 支持多种数据类型，包括[基本数据类型](Numeric-Boolean-String-Types.topic)、[日期和时间](date-and-time-types.md)、[数组](Array-types.topic)、[二进制数据](Binary-types.topic)、[枚举](Enumeration-types.topic)以及 [](JSON-And-JSONB-types.topic)。你还可以扩展和创建新的[自定义数据类型](Custom-data-types.topic)以满足特定需求。
+Exposed 支持多种数据类型，包括[基本数据类型](Numeric-Boolean-String-Types.topic)、[日期和时间](date-and-time-types.md)、[数组](Array-types.topic)、[二进制数据](Binary-types.topic)、[枚举](Enumeration-types.topic)以及 [](json-and-jsonb-types.md)。你还可以扩展和创建新的[自定义数据类型](Custom-data-types.topic)以满足特定需求。
 
 ### 如何创建自定义列类型？
 
