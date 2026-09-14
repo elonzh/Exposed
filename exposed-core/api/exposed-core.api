@@ -3462,6 +3462,15 @@ public class org/jetbrains/exposed/v1/core/statements/MergeTableStatement : org/
 	public fun prepareSQL (Lorg/jetbrains/exposed/v1/core/Transaction;Z)Ljava/lang/String;
 }
 
+public class org/jetbrains/exposed/v1/core/statements/MultiRowValuesInsertStatement : org/jetbrains/exposed/v1/core/statements/BatchInsertStatement {
+	public fun <init> (Lorg/jetbrains/exposed/v1/core/Table;ZZ)V
+	public synthetic fun <init> (Lorg/jetbrains/exposed/v1/core/Table;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun arguments ()Ljava/lang/Iterable;
+	public fun arguments ()Ljava/util/List;
+	public fun prepareSQL (Lorg/jetbrains/exposed/v1/core/Transaction;Z)Ljava/lang/String;
+	public fun validateLastBatch ()V
+}
+
 public class org/jetbrains/exposed/v1/core/statements/ReplaceSelectStatement : org/jetbrains/exposed/v1/core/statements/InsertSelectStatement {
 	public fun <init> (Ljava/util/List;Lorg/jetbrains/exposed/v1/core/AbstractQuery;)V
 	public fun prepareSQL (Lorg/jetbrains/exposed/v1/core/Transaction;Z)Ljava/lang/String;
@@ -3502,7 +3511,9 @@ public abstract class org/jetbrains/exposed/v1/core/statements/Statement {
 
 public abstract interface class org/jetbrains/exposed/v1/core/statements/StatementBuilder {
 	public fun batchInsert (Lorg/jetbrains/exposed/v1/core/Table;ZZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
+	public fun batchInsert (Lorg/jetbrains/exposed/v1/core/Table;ZZZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
 	public static synthetic fun batchInsert$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
+	public static synthetic fun batchInsert$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
 	public fun batchReplace (Lorg/jetbrains/exposed/v1/core/Table;ZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchReplaceStatement;
 	public static synthetic fun batchReplace$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchReplaceStatement;
 	public fun batchUpsert (Lorg/jetbrains/exposed/v1/core/Table;Ljava/util/List;Lkotlin/jvm/functions/Function2;Ljava/util/List;Lkotlin/jvm/functions/Function0;Z[Lorg/jetbrains/exposed/v1/core/Column;Lkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchUpsertStatement;
@@ -3544,7 +3555,9 @@ public abstract interface class org/jetbrains/exposed/v1/core/statements/Stateme
 
 public final class org/jetbrains/exposed/v1/core/statements/StatementBuilder$DefaultImpls {
 	public static fun batchInsert (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
+	public static fun batchInsert (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
 	public static synthetic fun batchInsert$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
+	public static synthetic fun batchInsert$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZZZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchInsertStatement;
 	public static fun batchReplace (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZLkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchReplaceStatement;
 	public static synthetic fun batchReplace$default (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;ZLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lorg/jetbrains/exposed/v1/core/statements/BatchReplaceStatement;
 	public static fun batchUpsert (Lorg/jetbrains/exposed/v1/core/statements/StatementBuilder;Lorg/jetbrains/exposed/v1/core/Table;Ljava/util/List;Lkotlin/jvm/functions/Function2;Ljava/util/List;Lkotlin/jvm/functions/Function0;Z[Lorg/jetbrains/exposed/v1/core/Column;Lkotlin/jvm/functions/Function2;)Lorg/jetbrains/exposed/v1/core/statements/BatchUpsertStatement;
@@ -4069,12 +4082,15 @@ public abstract interface class org/jetbrains/exposed/v1/core/vendors/DatabaseDi
 	public fun getRequiresAutoCommitOnCreateDrop ()Z
 	public fun getSequenceMaxValue ()J
 	public fun getSupportsAlterCheckConstraint ()Z
+	public fun getSupportsCheckConstraints ()Z
 	public fun getSupportsColumnTypeChange ()Z
 	public fun getSupportsCreateSchema ()Z
 	public fun getSupportsCreateSequence ()Z
 	public fun getSupportsDualTableConcept ()Z
+	public fun getSupportsGeneratedKeysRetrieval ()Z
 	public fun getSupportsIfNotExists ()Z
 	public abstract fun getSupportsMultipleGeneratedKeys ()Z
+	public fun getSupportsOnDelete ()Z
 	public fun getSupportsOnUpdate ()Z
 	public fun getSupportsOnlyIdentifiersInGeneratedKeys ()Z
 	public fun getSupportsOrderByNullsFirstLast ()Z
@@ -4109,11 +4125,14 @@ public final class org/jetbrains/exposed/v1/core/vendors/DatabaseDialect$Default
 	public static fun getRequiresAutoCommitOnCreateDrop (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSequenceMaxValue (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)J
 	public static fun getSupportsAlterCheckConstraint (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
+	public static fun getSupportsCheckConstraints (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsColumnTypeChange (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsCreateSchema (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsCreateSequence (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsDualTableConcept (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
+	public static fun getSupportsGeneratedKeysRetrieval (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsIfNotExists (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
+	public static fun getSupportsOnDelete (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsOnUpdate (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsOnlyIdentifiersInGeneratedKeys (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
 	public static fun getSupportsOrderByNullsFirstLast (Lorg/jetbrains/exposed/v1/core/vendors/DatabaseDialect;)Z
@@ -4297,6 +4316,7 @@ public abstract class org/jetbrains/exposed/v1/core/vendors/FunctionProvider {
 	public fun groupConcat (Lorg/jetbrains/exposed/v1/core/GroupConcat;Lorg/jetbrains/exposed/v1/core/QueryBuilder;)V
 	public fun hour (Lorg/jetbrains/exposed/v1/core/Expression;Lorg/jetbrains/exposed/v1/core/QueryBuilder;)V
 	public fun insert (ZLorg/jetbrains/exposed/v1/core/Table;Ljava/util/List;Ljava/lang/String;Lorg/jetbrains/exposed/v1/core/Transaction;)Ljava/lang/String;
+	public fun insertMultiRowValues (ZLorg/jetbrains/exposed/v1/core/Table;Ljava/util/List;Ljava/lang/String;ILorg/jetbrains/exposed/v1/core/Transaction;)Ljava/lang/String;
 	public fun insertValue (Ljava/lang/String;Lorg/jetbrains/exposed/v1/core/QueryBuilder;)V
 	public fun jsonCast (Lorg/jetbrains/exposed/v1/core/Expression;Lorg/jetbrains/exposed/v1/core/IColumnType;Lorg/jetbrains/exposed/v1/core/QueryBuilder;)V
 	public fun jsonContains (Lorg/jetbrains/exposed/v1/core/Expression;Lorg/jetbrains/exposed/v1/core/Expression;Ljava/lang/String;Lorg/jetbrains/exposed/v1/core/IColumnType;Lorg/jetbrains/exposed/v1/core/QueryBuilder;)V
@@ -4526,6 +4546,36 @@ public final class org/jetbrains/exposed/v1/core/vendors/PrimaryKeyMetadata {
 	public fun toString ()Ljava/lang/String;
 }
 
+public class org/jetbrains/exposed/v1/core/vendors/RedshiftDialect : org/jetbrains/exposed/v1/core/vendors/VendorDialect {
+	public static final field Companion Lorg/jetbrains/exposed/v1/core/vendors/RedshiftDialect$Companion;
+	public fun <init> ()V
+	public fun createDatabase (Ljava/lang/String;)Ljava/lang/String;
+	public fun createIndex (Lorg/jetbrains/exposed/v1/core/Index;)Ljava/lang/String;
+	public fun dropDatabase (Ljava/lang/String;)Ljava/lang/String;
+	public fun dropIndex (Ljava/lang/String;Ljava/lang/String;ZZ)Ljava/lang/String;
+	public fun getDefaultReferenceOption ()Lorg/jetbrains/exposed/v1/core/ReferenceOption;
+	public fun getRequiresAutoCommitOnCreateDrop ()Z
+	public fun getSupportsAlterCheckConstraint ()Z
+	public fun getSupportsCheckConstraints ()Z
+	public fun getSupportsCreateSequence ()Z
+	public fun getSupportsGeneratedKeysRetrieval ()Z
+	public fun getSupportsMultipleGeneratedKeys ()Z
+	public fun getSupportsOnDelete ()Z
+	public fun getSupportsOnUpdate ()Z
+	public fun getSupportsOnlyIdentifiersInGeneratedKeys ()Z
+	public fun getSupportsOrderByNullsFirstLast ()Z
+	public fun getSupportsRestrictReferenceOption ()Z
+	public fun getSupportsSetDefaultReferenceOption ()Z
+	public fun getSupportsSubqueryUnions ()Z
+	public fun listDatabases ()Ljava/lang/String;
+	public fun modifyColumn (Lorg/jetbrains/exposed/v1/core/Column;Lorg/jetbrains/exposed/v1/core/ColumnDiff;)Ljava/util/List;
+	public fun setColumnComment (Lorg/jetbrains/exposed/v1/core/Column;Ljava/lang/String;)Ljava/util/List;
+	public fun setSchema (Lorg/jetbrains/exposed/v1/core/Schema;)Ljava/lang/String;
+}
+
+public final class org/jetbrains/exposed/v1/core/vendors/RedshiftDialect$Companion : org/jetbrains/exposed/v1/core/vendors/VendorDialect$DialectNameProvider {
+}
+
 public class org/jetbrains/exposed/v1/core/vendors/SQLServerDialect : org/jetbrains/exposed/v1/core/vendors/VendorDialect {
 	public static final field Companion Lorg/jetbrains/exposed/v1/core/vendors/SQLServerDialect$Companion;
 	public fun <init> ()V
@@ -4610,12 +4660,15 @@ public abstract class org/jetbrains/exposed/v1/core/vendors/VendorDialect : org/
 	public fun getRequiresAutoCommitOnCreateDrop ()Z
 	public fun getSequenceMaxValue ()J
 	public fun getSupportsAlterCheckConstraint ()Z
+	public fun getSupportsCheckConstraints ()Z
 	public fun getSupportsColumnTypeChange ()Z
 	public fun getSupportsCreateSchema ()Z
 	public fun getSupportsCreateSequence ()Z
 	public fun getSupportsDualTableConcept ()Z
+	public fun getSupportsGeneratedKeysRetrieval ()Z
 	public fun getSupportsIfNotExists ()Z
 	public fun getSupportsMultipleGeneratedKeys ()Z
+	public fun getSupportsOnDelete ()Z
 	public fun getSupportsOnUpdate ()Z
 	public fun getSupportsOnlyIdentifiersInGeneratedKeys ()Z
 	public fun getSupportsOrderByNullsFirstLast ()Z

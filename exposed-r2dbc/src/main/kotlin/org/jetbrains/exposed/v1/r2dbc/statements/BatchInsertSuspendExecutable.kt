@@ -3,7 +3,11 @@ package org.jetbrains.exposed.v1.r2dbc.statements
 import org.jetbrains.exposed.v1.core.InternalApi
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.statements.BatchInsertStatement
+import org.jetbrains.exposed.v1.core.statements.MultiRowValuesInsertStatement
 import org.jetbrains.exposed.v1.core.statements.SQLServerBatchInsertStatement
+import org.jetbrains.exposed.v1.core.vendors.MariaDBDialect
+import org.jetbrains.exposed.v1.core.vendors.currentDialect
+import org.jetbrains.exposed.v1.core.vendors.inProperCase
 import org.jetbrains.exposed.v1.r2dbc.R2dbcTransaction
 import org.jetbrains.exposed.v1.r2dbc.statements.api.R2dbcPreparedStatementApi
 import org.jetbrains.exposed.v1.r2dbc.statements.api.R2dbcResult
@@ -48,10 +52,36 @@ open class SQLServerBatchInsertSuspendExecutable(
     }
 }
 
+/**
+ * Represents the execution logic for an SQL statement that batch inserts new rows into a table,
+ * specifically using a single multi-row value INSERT statement.
+ */
+open class MultiRowValuesInsertSuspendExecutable(
+    override val statement: MultiRowValuesInsertStatement
+) : BatchInsertSuspendExecutable<MultiRowValuesInsertStatement>(statement) {
+    override val isAlwaysBatch: Boolean = false
+
+    override suspend fun prepared(transaction: R2dbcTransaction, sql: String): R2dbcPreparedStatementApi {
+        // [MariaDB] r2dbc returnGeneratedValues() does not support adding RETURNING clause automatically
+        val needsManualReturning = statement.shouldReturnGeneratedValues &&
+            autoIncColumns.isNotEmpty() &&
+            currentDialect is MariaDBDialect
+        return if (needsManualReturning) {
+            @OptIn(InternalApi::class)
+            val generatedColumns = autoIncColumns.map { it.name.inProperCase() }.toTypedArray()
+            val replaceReturning = "$sql RETURNING ${generatedColumns.joinToString()}"
+            transaction.connection().prepareStatement(replaceReturning, false)
+        } else {
+            super.prepared(transaction, sql)
+        }
+    }
+}
+
 @Suppress("Unchecked_Cast")
 internal fun <S : BatchInsertStatement> S.executable(): BatchInsertSuspendExecutable<S> {
     return when (this) {
         is SQLServerBatchInsertStatement -> SQLServerBatchInsertSuspendExecutable(this)
+        is MultiRowValuesInsertStatement -> MultiRowValuesInsertSuspendExecutable(this)
         else -> BatchInsertSuspendExecutable(this)
     } as BatchInsertSuspendExecutable<S>
 }
