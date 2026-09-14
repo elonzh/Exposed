@@ -267,6 +267,41 @@ implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng:%postgreNG%")
 ```
 {src="exposed-databases-jdbc/src/main/kotlin/org/example/Databases.kt" include-symbol="postgresqldbNG"}
 
+### Amazon Redshift
+
+Amazon Redshift 仅支持 JDBC。添加
+[Amazon Redshift JDBC 驱动](https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-install.html)：
+
+```kotlin
+implementation("com.amazon.redshift:redshift-jdbc42:%redshift%")
+```
+
+然后使用 Redshift JDBC URL 进行连接：
+
+```kotlin
+Database.connect(
+    url = "jdbc:redshift://example-cluster.region.redshift.amazonaws.com:5439/database",
+    driver = "com.amazon.redshift.Driver",
+    user = "username",
+    password = "password"
+)
+```
+
+使用 Exposed 连接 Amazon Redshift 时，请注意以下限制：
+
+- Amazon Redshift 原生不支持在插入操作中返回生成的标识键。执行 Exposed `insert {}` 后，尝试访问该语句生成的
+  标识值将会失败。当应用程序需要插入记录的 ID 时，请使用显式指定或由客户端生成的 ID。
+- Amazon Redshift 仅将外键约束视为信息，不识别 `CHECK` 约束语法。因此 Exposed 不会创建 `ON DELETE`、
+  `ON UPDATE` 或 `CHECK` 约束。因此，`byte`、`ubyte` 和 `ushort` 列没有强制范围约束。
+- Amazon Redshift 不强制执行传统的二级索引。因此 Exposed 会跳过非唯一索引、部分索引、函数索引和类型化索引。
+  请在 Exposed 索引 API 之外定义 Redshift 排序键和分布键。
+- Amazon Redshift 将 `VARCHAR(MAX)` 值限制为 65,535 字节，将 `VARBYTE` 值限制为 16,777,216 字节。文本列
+  映射为 `VARCHAR(MAX)`，而二进制列和 blob 列映射为 `VARBYTE(16777216)`。
+- Amazon Redshift 没有原生 UUID 数据类型，因此 UUID 列使用 `VARCHAR(36)`。Exposed 写入标准的带连字符表示形式，
+  并可读取带连字符或不带连字符的十六进制文本。
+- Amazon Redshift 仅支持有限的列修改，无法映射到 Exposed 的通用列修改 API。构建列修改语句的请求会在向数据库
+  发送任何 SQL 之前失败。
+
 ### SQL Server
 
 添加所需依赖：

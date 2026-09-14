@@ -138,33 +138,60 @@
             <code-block lang="kotlin"
                         src="exposed-dsl/src/main/kotlin/org/example/examples/CreateExamples.kt"
                         include-lines="83-95"/>
-            <note>
-                <code>.batchInsert()</code> 函数在与数据库交互时仍然会创建多个 <code>INSERT</code> 语句。
-                <p>要将 <code>INSERT</code> 语句转换为 <code>BULK INSERT</code>，请使用
-                    相关 JDBC 驱动程序的
-                    <code>rewriteBatchedInserts=true</code>
-                    （或 <code>rewriteBatchedStatements=true</code>）
-                    选项。</p>
-                <p>有关更多信息，请参阅 <a
-                    href="https://dev.mysql.com/doc/connector-j/en/connector-j-connp-props-performance-extensions.html#cj-conn-prop_rewriteBatchedStatements">MySQL</a>
-                    和
-                    <a href="https://jdbc.postgresql.org/documentation/use/">PostgreSQL</a> 的此选项文档。</p>
-            </note>
 
             <p>
                 如果您不需要获取新生成的值（例如自增 ID），请将
                 <code>shouldReturnGeneratedValues</code> 参数设置为 <code>false</code>。这通过将批量插入分块来提高
                 批量插入的性能，而不是始终等待数据库同步新插入的对象状态。
             </p>
+            <note>
+                使用 JDBC 驱动时，<code>.batchInsert()</code> 函数默认会准备单个参数化
+                <code>PreparedStatement</code>，重复调用 <code>.addBatch()</code>，并定期将每个批次刷新到数据库。
+                <p>要将这种语句级批处理转换为真正的 <code>BULK INSERT</code>，请使用支持该功能的 JDBC 驱动所提供的
+                    连接配置参数，例如 PostgreSQL 的 <code>reWriteBatchedInserts=true</code>
+                    或 MySQL 的 <code>rewriteBatchedStatements=true</code>。
+                    即使这些标志设置为 <code>true</code>，Exposed 日志记录器也始终会显示未重写的
+                    多条插入 SQL 语句。
+                </p>
+            </note>
+            <note>
+                <p>使用 R2DBC 驱动时，大多数数据库都没有类似上述 JDBC 标志的连接参数，
+                    因此只能依赖驱动底层的批处理语句性能。
+                    某些数据库建议改用多行值构造器语法，以避免逐行往返。
+                    Exposed 还提供了 <code>.batchInsert()</code> 重载，在 <code>useMultiRowValues=true</code> 时启用
+                    这一特定语法。
+                </p>
+            </note>
+
             <p>
-                如果您想检查 <code>rewriteBatchedInserts</code> 和 <code>batchInsert</code> 是否正常
-                工作，您需要为驱动程序启用 JDBC 日志记录。这是必要的，因为 Exposed 将始终
-                显示未重写的多个插入语句。有关更多信息，请参阅
+                如果您想检查 JDBC 上的 <code>.batchInsert()</code> 是否能配合连接配置正常工作，
+                则需要为驱动启用 JDBC 日志记录。这是必要的，因为 Exposed 始终会显示未重写的多条插入语句。有关更多信息，请参阅
                 <a href="https://jdbc.postgresql.org/documentation/logging/">
                     如何在 PostgreSQL 中启用日志记录
                 </a>
-                。
+                。有关这些连接标志的更多信息，请参阅 <a
+                href="https://dev.mysql.com/doc/connector-j/en/connector-j-connp-props-performance-extensions.html#cj-conn-prop_rewriteBatchedStatements">MySQL</a>
+                和
+                <a href="https://jdbc.postgresql.org/documentation/use/">PostgreSQL</a> 的相关选项文档。
             </p>
+
+            <p>
+                无论使用哪种驱动，都可以通过专用的 <code>.batchInsert()</code> 并设置参数
+                <code>useMultiRowValues=true</code>，确保批量插入始终合并为单条多行
+                <code>INSERT ... VALUES (...), (...), ...</code> 语句。
+                这可以避免驱动批处理潜在的性能限制。由于重写由 Exposed 在语句准备并发送到数据库之前完成，
+                因此日志记录器始终只会显示一条插入 SQL 语句：
+            </p>
+            <code-block lang="kotlin"><![CDATA[
+                val cityNames = listOf("Paris", "Moscow", "Helsinki")
+
+                CitiesTable.batchInsert(
+                    cityNames,
+                    useMultiRowValues = true
+                ) { name ->
+                    this[CitiesTable.name] = name
+                }
+            ]]></code-block>
         </chapter>
     </chapter>
     <chapter title="读取" id="read">
