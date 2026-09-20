@@ -38,7 +38,7 @@ springBoot4 = "4.1.0"
 
 spring-security-crypto = "7.0.0"
 commons-logging = "1.4.0"
-bouncycastle = "1.85.2"
+bouncycastle = "1.86"
 joda-time = "2.14.3"
 junit5 = "5.14.1"
 junit6 = "6.0.1"
@@ -49,14 +49,14 @@ mustache = "0.9.14"
 hikariCP = "7.0.2"
 logcaptor = "2.12.6"
 maven-publish = "0.35.0"
-gradle-plugin-publish = "2.1.1"
+gradle-plugin-publish = "2.2.1"
 maven-plugin-development = "1.0.3"
 maven-api = "3.9.16"
 maven-annotations = "3.15.2"
 
 testcontainers = "2.0.5"
 
-flyway = "13.5.0"
+flyway = "13.6.0"
 
 [libraries]
 jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
