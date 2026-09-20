@@ -75,10 +75,40 @@ mvn exposed:generate-migrations
 
 至少需要配置以下参数：
 
-* 将 `tablesPackage` 设置为 Exposed 表定义所在的包名。
+* `tablesPackage`（Exposed 表定义所在的包名）或
+  `tablesPackages`（Exposed 表定义所在的一组包名）。
 * 数据库配置或 `Testcontainers` 配置。
 
-### 配置数据库连接
+### 配置表包名
+
+要配置 Exposed 表定义所在的位置，请根据所有表是放在同一个包中，还是分布于多个指定路径中，设置 `tablesPackage` 或 `tablesPackages` 参数：
+
+```xml
+<plugin>
+    <groupId>org.jetbrains.exposed.plugin</groupId>
+    <artifactId>exposed-maven-plugin</artifactId>
+    <version>%exposed_version%</version>
+    <configuration>
+        <tablesPackage>com.example.db.tables</tablesPackage>
+        <!-- or -->
+        <tablesPackages>
+            <package>com.example.db.auth</package>
+            <package>com.example.db.billing</package>
+        </tablesPackages>
+        <!-- other minimum parameters -->
+    </configuration>
+</plugin>
+```
+
+> 多值参数 `tablesPackages` 自插件 1.6.0 版本起可用；需要指定多个包时，应优先配置此参数。
+>
+{style="note"}
+
+> 如果除单值 `tablesPackage` 参数外还配置了 `tablesPackages` 参数，则会使用一个列表，其中包含两个属性值合并后去重的元素。
+>
+{style="note"}
+
+### 配置数据库连接 {#configure-a-database-connection}
 
 要配置数据库连接，请设置 `databaseUrl`、`databaseUser` 和 `databasePassword` 参数：
 
@@ -116,7 +146,8 @@ mvn exposed:generate-migrations
 >
 {style="tip"}
 
-> 当配置了 `testContainersImageName` 时，插件将使用 `Testcontainers`（而不是直接的数据库连接）生成数据库模式。
+> 当配置了 `testContainersImageName` 时，插件将使用 `Testcontainers` 而不是直接数据库连接来生成数据库模式。如果除[数据库连接属性](#configure-a-database-connection)外还配置了此参数，
+> 则其值始终优先，并将使用 `Testcontainers` 而不是直接连接。
 >
 {style="note"}
 

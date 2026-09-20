@@ -66,20 +66,47 @@ tasks.named("processResources") {
 
 至少需要配置以下属性：
 
-* `tablesPackage` 作为 Exposed 表定义所在的包名。
+* `tablesPackage`（Exposed 表定义所在的包名）或
+  `tablesPackages`（Exposed 表定义所在的包名集合）。
 * 数据库配置或 `Testcontainers` 配置。
 
-### 配置数据库连接
+### 配置表定义所在的包名
+
+要配置 Exposed 表定义所在的位置，请根据所有表是集中在同一个包中还是分布在多个特定路径下，设置 `tablesPackage` 或 `tablesPackages` 属性：
+
+```kotlin
+exposed {
+    migrations {
+        tablesPackage = "com.example.db.tables"
+        // or
+        tablesPackages = listOf(
+            "com.example.db.auth",
+            "com.example.db.billing",
+        )
+        // ...
+    }
+}
+```
+
+> 多值 `tablesPackages` 属性自插件 1.6.0 版本起可用；需要指定多个包时，应优先配置此属性。
+>
+{style="note"}
+
+> 如果除单值 `tablesPackage` 属性外还配置了 `tablesPackages` 属性，则会使用一个列表，其中包含两个属性值合并后去重的元素。
+>
+{style="note"}
+
+### 配置数据库连接 {#configure-a-database-connection}
 
 要配置数据库连接，请设置 `databaseUrl`、`databaseUser` 和 `databasePassword` 属性：
 
 ```kotlin
 exposed {
     migrations {
-        tablesPackage.set("com.example.db.tables")
-        databaseUrl.set("jdbc:postgresql://localhost:5432/mydb")
-        databaseUser.set("postgres")
-        databasePassword.set("password")
+        tablesPackage = "com.example.db.tables"
+        databaseUrl = "jdbc:postgresql://localhost:5432/mydb"
+        databaseUser = "postgres"
+        databasePassword = "password"
     }
 }
 ```
@@ -91,8 +118,8 @@ exposed {
 ```kotlin
 exposed {
     migrations {
-        tablesPackage.set("com.example.db.tables")
-        testContainersImageName.set("postgres:latest")
+        tablesPackage = "com.example.db.tables"
+        testContainersImageName = "postgres:latest"
     }
 }
 ```
@@ -100,7 +127,7 @@ exposed {
 > 
 {style="tip"}
 
-> 当配置了 `testContainersImageName` 时，插件将使用 `Testcontainers` 而不是直接的数据库连接来生成模式。
+> 当配置了 `testContainersImageName` 时，插件将使用 `Testcontainers` 而不是直接的数据库连接来生成模式。如果此属性与[数据库连接属性](#configure-a-database-connection)同时配置，则始终优先采用此属性的值，并使用 `Testcontainers` 而不是直接连接。
 >
 {style="note"}
 
@@ -167,12 +194,12 @@ exposed {
     migrations {
         // ...
         classpath = sourceSets.main.get().runtimeClasspath
-        fileDirectory.set(layout.projectDirectory.dir("src/main/resources/db/migration"))
-        filePrefix.set("V")
-        fileVersionFormat.set(VersionFormat.TIMESTAMP_ONLY)
-        fileSeparator.set("__")
-        useUpperCaseDescription.set(true)
-        fileExtension.set(".sql")
+        fileDirectory = layout.projectDirectory.dir("src/main/resources/db/migration")
+        filePrefix = "V"
+        fileVersionFormat = VersionFormat.TIMESTAMP_ONLY
+        fileSeparator = "__"
+        useUpperCaseDescription = true
+        fileExtension = ".sql"
     }
 }
 ```
