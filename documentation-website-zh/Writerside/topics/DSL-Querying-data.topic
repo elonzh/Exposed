@@ -205,6 +205,80 @@
 
         </chapter>
     </chapter>
+    <chapter id="tableless-select">
+        <title>无表 <code>SELECT</code> 查询</title>
+        <p>
+            使用顶层 <code>select()</code> 函数，无需指定表即可查询任意数量的表达式（具体来说，不使用 <code>FROM</code> 子句）。
+            无表查询以一个隐式行开始，因此投影会返回一行，除非
+            <code>.where { ... }</code> 条件将其过滤掉。Exposed 会生成数据库原生的无数据源
+            <code>SELECT</code> 语句形式，并在需要的数据库中使用 dual 表。
+        </p>
+        <code-block lang="kotlin"><![CDATA[
+            val numberOne = intLiteral(1)
+            val query: Query = select(numberOne, CurrentTimestamp)
+            val one: Int = query.single()[numberOne]
+
+            val query2 = select(listOf(intLiteral(1), stringLiteral("ready")))
+
+            val noRows = select(intLiteral(1)).where { Op.FALSE }
+        ]]></code-block>
+        <p>在 H2 中，<code>query</code> 会生成以下 SQL：</p>
+        <code-block lang="sql">
+            SELECT 1, CURRENT_TIMESTAMP
+        </code-block>
+        <p>
+            对于单个表达式，<code>selectValue()</code> 会在当前事务中立即执行，并返回具有对应类型的值。
+            其 R2DBC 版本是一个挂起函数。这样就无需仅为了将表达式用作结果行的键而保留该表达式。
+        </p>
+        <code-block lang="kotlin"><![CDATA[
+            val one: Int = selectValue(intLiteral(1))
+            val serverTime = selectValue(CurrentTimestamp)
+        ]]></code-block>
+        <p>
+            为方便使用，<code>selectValue()</code> 可以直接接受受支持的 Kotlin 标量值，并在内部将其包装为 SQL 字面量。
+            例如，<code>selectValue(1)</code> 等价于
+            <code>selectValue(intLiteral(1))</code>。可选模块提供的日期和时间类型仍需使用
+            各自模块的字面量函数。
+        </p>
+        <code-block lang="kotlin"><![CDATA[
+            val one: Int = selectValue(1)          // Executes SELECT 1 and returns Int
+            val ready = selectValue("ready")      // Executes SELECT 'ready' and returns String
+            val serverTime = selectValue(CurrentTimestamp)
+        ]]></code-block>
+        <p>
+            这适用于无需显式构造字面量表达式的场景，等价于以下写法：
+        </p>
+        <code-block lang="kotlin"><![CDATA[
+            val one = literal(1)
+            val query = select(one)
+            val result: Int = query.single()[one]
+
+            val immediate: Int = selectValue(1)  // Equivalent SQL literal, returned immediately
+        ]]></code-block>
+        <p>
+            无表查询仍然是普通的 <code>Query</code> 对象，因此可以进行过滤、通过集合运算组合、
+            设置别名作为派生表，或传入 insert-from-select 及其他现有 API。
+            此函数不会根据投影表达式推断 <code>FROM</code> 子句：<code>select(Users.name)</code>
+            表示生成 SQL <code>SELECT users.name</code>，而不是对 <code>Users</code> 表进行查询。
+        </p>
+        <chapter id="tableless-select-limitations">
+            <title>限制</title>
+            <p>
+                无表 <code>SELECT</code> 存在一些数据库限制：
+            </p>
+            <list>
+                <li>
+                    SQL Server 和 23ai 之前的 Oracle 版本无法直接将 <code>EXISTS</code> 谓词用于投影。
+                </li>
+                <li>
+                    对序列、函数、lateral 查询以及 merge 的支持仍取决于具体数据库。
+                </li>
+            </list>
+            <p>
+                Exposed 会发送由 DSL 表示并生成的 SQL；它不会为了实现跨数据库兼容而重写表达式。
+            </p>
+        </chapter>
+    </chapter>
     <chapter id="conditional-where">
         <title>条件 <code>WHERE</code></title>
         <p>
