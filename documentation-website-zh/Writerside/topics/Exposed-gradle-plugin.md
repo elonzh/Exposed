@@ -60,7 +60,7 @@ tasks.named("processResources") {
 }
 ```
 
-## 配置
+## 配置 {#configuration}
 
 在你的 <path>build.gradle.kts</path> 文件中使用 `exposed.migrations` 块配置插件。
 

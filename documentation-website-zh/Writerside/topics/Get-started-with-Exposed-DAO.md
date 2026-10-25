@@ -114,7 +114,7 @@ Exposed 的 DAO API 提供了基础 `IdTable` 类及其子类，用于定义使�
 
 ## 定义实体
 
-使用 DAO 方法时，使用 `IntIdTable` 定义的每个表都必须与相应的[实体类](DAO-Entity-definition.topic)关联。实体类表示表中的单个记录，由主键唯一标识。
+使用 DAO 方法时，使用 `IntIdTable` 定义的每个表都必须与相应的[实体类](dao-entity-definition.md)关联。实体类表示表中的单个记录，由主键唯一标识。
 
 要定义实体，请使用以下代码更新你的 **Task.kt** 文件：
 
@@ -249,5 +249,5 @@ Remaining tasks: [Task(id=1, title=Try Exposed DAO, completed=true)]
 
 干得好！你已使用 Exposed 的 DAO API 构建了一个简单的控制台应用程序，在内存数据库中创建、查询和操作任务数据。
 
-既然你已经掌握了基础知识，现在可以深入了解 DAO API 提供的功能了。继续探索 [CRUD 操作](DAO-CRUD-Operations.topic)或学习如何[定义实体之间的关系](DAO-Relationships.topic)。
+既然你已经掌握了基础知识，现在可以深入了解 DAO API 提供的功能了。继续探索 [CRUD 操作](dao-crud-operations.md)或学习如何[定义实体之间的关系](dao-relationships.md)。
 这些后续章节将帮助你使用 Exposed 的类型安全、面向对象方法构建更复杂的现实世界数据模型。

@@ -143,10 +143,9 @@ Exposed 应用程序至少需要 [核心模块](#core-module) 和一个
 每个模块的访问器是移除模块名中的 `exposed-` 前缀，并将所有连字符转换为嵌套访问器后得到的。
 例如，`exposed-kotlin-datetime` 会变为 `exposedLibs.kotlin.datetime`。
 
-> {style="note"}
-
 > 版本目录是 Gradle 的一项功能。Maven 用户应像上文所示直接声明依赖。
-> {style="note"}
+>
+{style="note"}
 
 所有模块共用同一个 `exposed` 版本，您可以在一处为整个版本目录覆盖该版本：
 
@@ -169,7 +168,7 @@ Exposed 由多个模块组成，分为以下几类：
 
 - [核心模块](#core-module)
 - [传输模块](#transport-modules)
-- [数据库访问模块](#database-access-module)
+- [数据库访问模块](#database-access-modules)
 - [扩展模块](#extension-modules)
 
 ### 核心模块 {#core-module}
@@ -192,13 +191,18 @@ Exposed 由多个模块组成，分为以下几类：
 > 您只需要一个传输模块——`exposed-jdbc` 或 `exposed-r2dbc`，而不是两者都用。
 > {style="note"}
 
-### 数据库访问模块 {#database-access-module}
+### 数据库访问模块 {#database-access-modules}
 
-Exposed 提供了一个可选的数据库访问模块，它建立在 `exposed-core` 之上，为处理数据库数据提供更高级别的抽象：
+Exposed 提供了多个可选的数据库访问模块，它们建立在 `exposed-core` 之上，为处理数据库数据提供更高级别的抽象。请选择与您的传输模块匹配的模块：
 
-| 模块        | 功能                                                                                                            |
-|---------------|---------------------------------------------------------------------------------------------------------------------|
+| 模块                | 功能                                                                                                            |
+|---------------------|---------------------------------------------------------------------------------------------------------------------|
 | `exposed-dao` | 提供数据访问对象（DAO）API。<br/> 需要 `exposed-jdbc`，不兼容 `exposed-r2dbc`。 |
+| `exposed-dao-r2dbc` | 提供适用于 R2DBC 的 DAO API。<br/> 需要 `exposed-r2dbc`，目前处于实验性预览阶段，其 API 在不同版本之间仍可能发生变化。 |
+
+> 不要在同一个 source set 中同时使用这两个 DAO 模块：它们都声明了简单名称相同的 `Entity`、`EntityClass` 和 `EntityCache`。
+> 有关两者之间的差异，请参阅 [](migrating-from-jdbc-to-r2dbc-dao.md)。
+> {style="note"}
 
 ### 扩展模块 {#extension-modules}
 

@@ -69,7 +69,7 @@ mvn exposed:generate-migrations
 </plugin>
 ```
 
-## 配置
+## 配置 {#configuration}
 
 请使用 `<configuration>` 块配置插件；该块位于 <path>pom.xml</path> 文件的插件条目中。
 

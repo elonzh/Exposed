@@ -5,6 +5,12 @@
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
        title="表类型" id="DAO-Table-Types" help-id="DAO-Table-types">
     <include from="DSL-Table-Types.topic" element-id="dsl-core-table-class"/>
+    <note>
+        本页所有内容均适用于 JDBC DAO 和 R2DBC DAO。表类型来自
+        <code>exposed-core</code>，由两种驱动共享，因此在二者之间切换时无需更改表定义。
+        有关 DAO 中存在差异的部分，请参阅
+        <a href="migrating-from-jdbc-to-r2dbc-dao.md"/>。
+    </note>
     <chapter title="自增 ID 列表" id="defining-tables">
         <snippet id="dao-table-types">
             <p>

@@ -192,6 +192,16 @@
                     this[CitiesTable.name] = name
                 }
             ]]></code-block>
+
+            <p>
+                同一批次中的各行可以设置不同的列。如果某列在所有行中均未设置，该列将完全从语句中省略，
+                由数据库应用其默认值。如果某列仅在部分行中设置，则未设置该列的行仍然需要一个值，
+                Exposed 会在这些行中使用通过 <code>default()</code> 声明的默认值。
+                通过 <code>defaultExpression()</code> 或 <code>databaseGenerated()</code> 声明、
+                只能由数据库求值的默认值无法作为参数传递：除非为每行分别生成独立的值子句，
+                否则此类批次会因 <code>BatchDataInconsistentException</code> 而失败。
+                设置 <code>useMultiRowValues = true</code> 正是为了为每行生成独立的值子句。
+            </p>
         </chapter>
     </chapter>
     <chapter title="读取" id="read">

@@ -19,7 +19,7 @@
         熟悉的 SQL 概念，同时享受 Kotlin 提供的类型安全。
     </p>
     <p>
-        <a href="DAO-CRUD-Operations.topic">数据访问对象（DAO）API</a> 提供了一种面向对象的数据库交互方式，
+        <a href="dao-crud-operations.md">数据访问对象（DAO）API</a> 提供了一种面向对象的数据库交互方式，
         类似于传统的对象关系映射（ORM）框架，如 Hibernate。
         此 API 更简洁，提供了一种更直观且以 Kotlin 为中心的数据库交互方式。
     </p>

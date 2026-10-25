@@ -369,7 +369,7 @@
             }
         ]]></code-block>
         <tip>
-            有关 <code>ColumnTransformer</code> 的更多详情，请参阅<a href="Column-transformation.topic">列转换</a>。
+            有关 <code>ColumnTransformer</code> 的更多详情，请参阅<a href="column-transformation.md">列转换</a>。
         </tip>
         <p>新列类型和转换器可以在表定义中使用：</p>
 
@@ -448,7 +448,7 @@
             }
         </code-block>
         <tip>
-            有关 <code>transform()</code> 的更多详情，请参阅<a href="Column-transformation.topic">列转换</a>。
+            有关 <code>transform()</code> 的更多详情，请参阅<a href="column-transformation.md">列转换</a>。
         </tip>
         <note>
             要使用 <code>hstore</code> 数据类型，必须先在数据库中启用扩展，运行 <code>exec(&quot;CREATE EXTENSION hstore;&quot;)</code>。

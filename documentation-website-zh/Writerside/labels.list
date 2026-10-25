@@ -9,5 +9,7 @@
     <primary-label id="r2dbc" short-name="" name="R2DBC" color="purple">
         仅 R2DBC
     </primary-label>
-
+    <primary-label id="experimental" name="实验性" short-name="实验性" color="tangerine">
+        此功能为实验性功能，可能随时被移除或更改。使用前必须显式选择启用（详见下文）。
+    </primary-label>
 </labels>

@@ -45,7 +45,7 @@ Exposed 提供了 [`inList()`](https://jetbrains.github.io/Exposed/api/exposed-c
 
 ### 是否可以创建具有循环（环形）引用的表？
 
-可以。要定义此类表，你可以使用 [`reference()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/reference.html) 或 [`optReference()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/opt-reference.html) 函数来建立表之间的外键关系。有关更多信息，请参见 [](DAO-Relationships.topic) 主题。
+可以。要定义此类表，你可以使用 [`reference()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/reference.html) 或 [`optReference()`](https://jetbrains.github.io/Exposed/api/exposed-core/org.jetbrains.exposed.v1.core/-table/opt-reference.html) 函数来建立表之间的外键关系。有关更多信息，请参见 [](dao-relationships.md) 主题。
 
 ### 如何使用保存点？
 
