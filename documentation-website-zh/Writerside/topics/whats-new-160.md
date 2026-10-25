@@ -1,6 +1,6 @@
 <show-structure for="chapter,procedure" depth="2"/>
 
-# Exposed 1.6.0 新特性 {#what-s-new-in-exposed-1-6-0}
+# Exposed 1.6.0 新特性 {id="what-s-new-in-exposed-1-6-0"}
 
 ## R2DBC DAO 支持 {#r2dbc-dao-support}
 

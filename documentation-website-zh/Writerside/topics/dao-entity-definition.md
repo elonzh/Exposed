@@ -1,6 +1,6 @@
 <show-structure for="chapter,procedure" depth="2"/>
 
-# 实体定义 {#entity-definition}
+# 实体定义 {id="entity-definition"}
 
 <link-summary>了解如何定义 DAO 实体并将其映射到数据库表。</link-summary>
 

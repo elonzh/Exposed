@@ -1,6 +1,6 @@
 <show-structure for="chapter" depth="2"/>
 
-# 关系 {#relationships}
+# 关系 {id="relationships"}
 
 <link-summary>了解如何定义和使用数据库表及 DAO 实体之间的关系。</link-summary>
 

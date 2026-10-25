@@ -1,6 +1,6 @@
 <show-structure for="chapter,procedure" depth="2"/>
 
-# CRUD 操作 {#crud-operations}
+# CRUD 操作 {id="crud-operations"}
 
 <link-summary>了解如何使用 Exposed 的 DAO（数据访问对象）API 执行 SQL CRUD 操作。</link-summary>
 

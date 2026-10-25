@@ -3,7 +3,7 @@
 了解如何将基于 DAO 的应用程序从 JDBC 迁移到 R2DBC。
 </link-summary>
 
-# 从 JDBC DAO 迁移到 R2DBC DAO {#migrating-from-jdbc-dao-to-r2dbc-dao}
+# 从 JDBC DAO 迁移到 R2DBC DAO {id="migrating-from-jdbc-dao-to-r2dbc-dao"}
 
 <primary-label ref="experimental"/>
 
