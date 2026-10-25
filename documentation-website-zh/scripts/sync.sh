@@ -22,7 +22,8 @@ echo ""
 
 # Step 1: Detect changes
 echo "Step 1: Detecting changes..."
-CHANGES=$(bash "$SCRIPT_DIR/detect-changes.sh" "$@" 2>&1)
+# Capture only machine-readable results; leave diagnostics on stderr.
+CHANGES=$(bash "$SCRIPT_DIR/detect-changes.sh" "$@")
 
 if [ "$CHANGES" = "NO_CHANGES" ]; then
     echo "No changes detected. Nothing to do."
