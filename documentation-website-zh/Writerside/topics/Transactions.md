@@ -44,6 +44,21 @@ suspendTransaction {
 [`withContext()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html)
 或 [`async()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/async.html)。
 
+> JDBC 的 `suspendTransaction()` 函数会在调用方的调度器上执行阻塞式 JDBC 调用。
+> 如果某个事务在等待行锁（例如通过 `forUpdate()` 获取的锁），而持有该锁的事务又挂起在
+> 同一个单线程调度器上（例如普通的 `runBlocking {}`），那么持锁方无法恢复执行以释放锁，
+> 这会导致两个事务相互死锁。为避免这个问题，请将可能相互等待的事务运行在具有足够线程的调度器上：
+>
+> ```kotlin
+> withContext(Dispatchers.IO) {
+>     suspendTransaction {
+>         // DSL/DAO 操作放在这里
+>     }
+> }
+> ```
+>
+{style="note"}
+
 
 ## 访问返回值
 
